@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+# Second whole-branch review approved the first-round optimization with no remaining Critical or Important findings; fresh final verification passes 122/122 tests, skill validation, and the 3,455-record real catalog validation.
 + Added Windows case-variant package-path regressions and explicit Win32/POSIX physical-identity comparison semantics.
 ~ Reject ZIP/checksum and source/output identity collisions with structured `PACKAGE_PATH_COLLISION` errors before temporary files or transaction state are created.
 # The path-identity fix preserves the formal 3,459-entry ZIP at 44,221,247 bytes and SHA-256 `da9110312036932c6e861cc1741710775280a76093a54a16894c15f238efaa91`.

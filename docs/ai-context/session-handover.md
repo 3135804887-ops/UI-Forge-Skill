@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: second whole-branch review approved the first-round optimization with no remaining Critical or Important findings. Fresh final verification passes 122/122 tests, skill validation, and the real 3,455-component catalog validation with zero errors or warnings.
 - Completed: package path identity hardening rejects non-existing Windows ZIP/checksum names that differ only by case before temporary-file creation; Win32 and POSIX comparison semantics are explicit, focused tests pass 30/30, the full suite passes 122/122, and the formal ZIP hash remains unchanged.
 - Completed: final-review Important 1 now passes at `1ebffa9`. After preserving a failed full round (`en-vue-migration`) and an interrupted calibration (`en-category-options`) as RED evidence, two minimal frontmatter/static-test fixes were made. A fully restarted set of 19 new `fork_turns:none` evaluators matched 19/19 verdicts and 13/13 baseline labels; all three broad negatives were stable 3/3 `no-trigger`.
 - Historical RED checkpoint: the first final-review rerun scored 18/19 individual verdicts and 12/13 labels because `en-vue-migration` falsely triggered. It is preserved in the raw evidence but superseded as current status by the complete 19/19 rerun at `1ebffa9`.
