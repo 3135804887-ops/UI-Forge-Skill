@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
+~ Hardened CLI parsing against empty and whitespace-only catalogs, queries, categories, and show IDs, preventing blank explicit catalog paths from falling through to another discovery source.
+~ Made `--json` apply to all usage failures, including malformed flags and values, with a stable structured stderr envelope.
++ Exported the shared public `isValidComponentId` schema helper and used it for record, manifest, and CLI validation.
++ Added exact serialized JSON and child-process boundary regressions for indentation, property order, trailing newlines, empty values, parser failures, and shared ID decisions.
+# Shared ID validation removes duplicated regex policy; structured usage errors keep automation reliable even when parsing cannot complete.
 + Added the zero-dependency `validate`, `search`, and `show` catalog CLI with stable JSON and human-readable output.
 + Added process-level CLI regression coverage for exact-ID lookup, complete code preservation, search flags, empty results, invalid usage/catalogs, discovery diagnostics, and exit codes `0`/`1`/`2`.
 ~ Copied the search result array's non-enumerable `relatedCategories` property into the stable CLI response envelope.

@@ -4,6 +4,7 @@ import {
   SCHEMA_VERSION,
   STATUS_RANK,
   containsMetadataUrl,
+  isValidComponentId,
   validateManifest,
   validateRecord,
 } from "../lib/catalog-schema.mjs";
@@ -33,6 +34,30 @@ test("exports schema version and stable status order", () => {
 test("accepts a valid component and manifest", () => {
   assert.deepEqual(validateRecord(validRecord), []);
   assert.deepEqual(validateManifest({ schema_version: 1, component_count: 1, files: [{ id: validRecord.id, path: "button/shimmer-button--a1b2c3d4.json", sha256: "b".repeat(64) }], digest: "c".repeat(64) }), []);
+});
+
+test("shares one component ID decision across records and manifests", () => {
+  const ids = [
+    validRecord.id,
+    "button/missing--aaaaaaaa",
+    "Button/missing--aaaaaaaa",
+    "button/missing--aaaaaaa",
+    "button/missing",
+    "",
+    "   ",
+  ];
+  for (const id of ids) {
+    const expected = isValidComponentId(id);
+    const recordAccepts = !validateRecord({ ...validRecord, id }).some(({ code }) => code === "INVALID_ID");
+    const manifestAccepts = !validateManifest({
+      schema_version: 1,
+      component_count: 1,
+      files: [{ id, path: "button/component.json", sha256: "b".repeat(64) }],
+      digest: "c".repeat(64),
+    }).some(({ code }) => code === "INVALID_ID");
+    assert.equal(recordAccepts, expected, id);
+    assert.equal(manifestAccepts, expected, id);
+  }
 });
 
 test("rejects metadata URLs while allowing URLs inside code", () => {

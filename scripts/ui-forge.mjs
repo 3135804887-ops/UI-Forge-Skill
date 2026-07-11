@@ -3,13 +3,14 @@
 import { discoverCatalog } from "../lib/catalog-config.mjs";
 import { validateCatalog } from "../lib/catalog-loader.mjs";
 import { searchCatalog } from "../lib/catalog-search.mjs";
+import { isValidComponentId } from "../lib/catalog-schema.mjs";
 
-const USAGE = `Usage:
-  ui-forge validate [--catalog PATH] [--json]
-  ui-forge search QUERY [--category NAME] [--limit N] [--include-incomplete] [--include-invalid] [--catalog PATH] [--json]
-  ui-forge show ID [--catalog PATH] [--json]
-`;
-const EXACT_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*\/[a-z0-9]+(?:-[a-z0-9]+)*--[0-9a-f]{8}$/;
+const USAGE_LINES = [
+  "ui-forge validate [--catalog PATH] [--json]",
+  "ui-forge search QUERY [--category NAME] [--limit N] [--include-incomplete] [--include-invalid] [--catalog PATH] [--json]",
+  "ui-forge show ID [--catalog PATH] [--json]",
+];
+const USAGE = `Usage:\n${USAGE_LINES.map((line) => `  ${line}`).join("\n")}\n`;
 
 class UsageError extends Error {}
 
@@ -57,6 +58,7 @@ function parseArguments(argv) {
     if (valueFlags.has(argument)) {
       const value = argv[index + 1];
       if (value === undefined || value.startsWith("--")) throw new UsageError(`${argument} requires a value.`);
+      if (value.trim() === "") throw new UsageError(`${argument} must not be empty.`);
       options[optionName] = value;
       index += 1;
     } else {
@@ -70,6 +72,12 @@ function parseArguments(argv) {
     if (command === "show") throw new UsageError("show requires exactly one component ID.");
     throw new UsageError("validate does not accept positional arguments.");
   }
+  if (command === "search" && positional[0].trim() === "") {
+    throw new UsageError("search query must not be empty.");
+  }
+  if (command === "show" && positional[0].trim() === "") {
+    throw new UsageError("show ID must not be empty.");
+  }
   if (command === "search" && options.limit !== undefined) {
     if (!/^[1-9][0-9]*$/.test(options.limit)) throw new UsageError("--limit must be a positive integer.");
     options.limit = Number(options.limit);
@@ -82,8 +90,16 @@ function writeJson(stream, value) {
   stream.write(`${JSON.stringify(value, null, 2)}\n`);
 }
 
-function writeUsageError(error) {
-  process.stderr.write(`Error: ${error.message}\n${USAGE}`);
+function writeUsageError(error, { command, json }) {
+  if (json) {
+    writeJson(process.stderr, {
+      command,
+      error: { code: "INVALID_USAGE", message: error.message },
+      usage: USAGE_LINES,
+    });
+  } else {
+    process.stderr.write(`Error: ${error.message}\n${USAGE}`);
+  }
 }
 
 function validationEnvelope(result) {
@@ -218,7 +234,7 @@ async function run(parsed) {
     return 0;
   }
 
-  if (!EXACT_ID.test(parsed.value)) {
+  if (!isValidComponentId(parsed.value)) {
     writeCommandError("show", "INVALID_COMPONENT_ID", "show requires an exact component ID.", parsed.options.json);
     return 1;
   }
@@ -232,12 +248,13 @@ async function run(parsed) {
   return 0;
 }
 
+const rawArguments = process.argv.slice(2);
 let parsed;
 try {
-  parsed = parseArguments(process.argv.slice(2));
+  parsed = parseArguments(rawArguments);
 } catch (error) {
   if (!(error instanceof UsageError)) throw error;
-  writeUsageError(error);
+  writeUsageError(error, { command: rawArguments[0] ?? null, json: rawArguments.includes("--json") });
   process.exitCode = 1;
 }
 
