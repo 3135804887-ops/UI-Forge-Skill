@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+~ Marked initial SKILL/README findings and optimization order as historical baseline, removed stale duplicate key-file descriptions, and tied the expanded trigger evidence to the exact `b7770b9` content.
 + Added adversarial non-React category/option trigger cases for Vue, SwiftUI, native HTML, and Chinese framework-specific requests.
 ~ Tightened the frontmatter itself so category-option activation requires React/local-catalog context while explicit UI Forge requests still activate.
 ~ Corrected the install flow: the current Release archive is legacy input that must be converted by `build-catalog.mjs` before runtime validation; a directly usable cleaned asset is only a future format.

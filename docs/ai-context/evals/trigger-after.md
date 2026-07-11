@@ -1,6 +1,6 @@
 # UI Forge Trigger Evaluation After Rewrite
 
-- Skill revision: Task 8 working tree before commit
+- Skill revision: pre-commit evaluated working tree whose exact content was committed as `b7770b9`
 - Dataset: the original 13 cases plus 5 review-added non-React adversarial negatives in `tests/skill-trigger-cases.json`
 - Method: one fresh-context evaluator read only `SKILL.md`; expected labels and baseline results were hidden
 - Result: 18/18 cases matched expected labels

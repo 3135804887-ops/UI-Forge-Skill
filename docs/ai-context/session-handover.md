@@ -11,13 +11,13 @@
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
 - Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
-- Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
+- Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; at that historical baseline all 7 negative cases over-triggered, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
 - Next: execute Task 9 against the full legacy archive, generate the cleaned catalog outside Git, validate record accounting and known repairs, repeat the build for determinism, and package local evidence without publishing a release.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
 - Completed: user approved the written first-round specification.
-- Superseded: the plan-review checkpoint moved into execution with the trigger baseline task; no `SKILL.md` behavior has been changed yet.
+- Superseded historical checkpoint: the plan-review checkpoint moved into execution with the trigger baseline task; the statement that no `SKILL.md` behavior had changed was true only before Task 8.
 - Blocked: none.
 
 ## Recent decisions
@@ -54,8 +54,8 @@
 - Treat catalog discovery as a lightweight manifest check; full component parsing, digest verification, and record validation occur only during catalog loading.
 - Use platform-specific config/data roots plus `~/.ui-forge/catalog` as deterministic common install candidates; relative config values resolve from the owning config file.
 - Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
-- Freeze `tests/skill-trigger-cases.json` as the prompt matrix reused after the trigger rewrite; do not tune cases to the current classifications.
-- Treat the current repository as a prompt-driven component catalog adapter, not yet as a self-contained executable skill.
+- Preserve the original 13 trigger cases as the baseline; add new adversarial classes without tuning the original prompts to observed classifications.
+- Historical initial-audit view: before Tasks 2–8, the repository was a prompt-driven catalog adapter rather than a self-contained executable skill.
 - Preserve the component archive outside Git; inspect release assets from a temporary directory instead of committing or extracting them into the repository.
 - Use behavior tests before editing the skill instructions. Future skill changes should follow RED-GREEN-REFACTOR with baseline prompts and forward tests.
 - Prioritize portability and deterministic discovery before expanding documentation or adding more examples.
@@ -66,20 +66,20 @@
 - Remove metadata URLs from runtime records while retaining non-clickable source identity fields.
 - Trigger only for explicit existing-component discovery/reuse or explicit UI Forge requests.
 
-## Findings
+## Initial Audit Findings (Historical Baseline)
 
-- `SKILL.md` is structurally valid, 263 lines / about 1,526 words, but contains five hard-coded references to `F:\爬虫\21st_components_full\` and Claude-specific `Glob`/`Grep` pseudo-tool syntax.
-- The trigger description is very broad and process-heavy. It can conflict with other frontend/design skills and may cause over-triggering.
-- The release has one component archive (`ui-forge-components-v1.0.0.zip`, 26,936,805 bytes), but no standalone `.skill` asset even though README describes one.
+- At the initial audit, `SKILL.md` was 263 lines / about 1,526 words and contained five hard-coded references to `F:\爬虫\21st_components_full\` plus Claude-specific `Glob`/`Grep` pseudo-tool syntax; Task 8 removed these.
+- At the initial audit, the trigger description was broad and process-heavy; Task 8 replaced it and the expanded 18-case evaluation now passes.
+- At the initial audit, the Release had one legacy component archive (`ui-forge-components-v1.0.0.zip`, 26,936,805 bytes) and no standalone `.skill` asset; current documentation now describes the legacy-to-cleaned build flow accurately.
 - Archive inventory: 47 top-level categories, 4,360 JSON files, 25,885 text code files, 84,903,691 uncompressed bytes.
 - Three malformed JSON files: `background/Liquid_Metal.json`, `background/Static_Radial_Gradient.json`, and `background/Swirl.json`.
 - Of 4,357 parseable metadata files, only 3,455 URLs are unique; 902 records duplicate an existing source URL.
 - Every parseable JSON embeds its complete code in `code_blocks`; all 25,882 corresponding `_code_*.txt` files are newline-normalized duplicates. The archive therefore stores the same source twice.
-- Metadata has only `url`, `title`, `description`, `category`, `code_blocks`, and `scraped_at`; it has no dependency, framework, license, accessibility, test, or quality fields. Current "production-ready/tested/accessible" claims are not evidenced by the package.
-- README line references are stale (`SKILL.md` path is at line 78, not around line 96), and `CONTRIBUTING.md` still contains `YOUR_USERNAME` links.
+- Legacy metadata has only `url`, `title`, `description`, `category`, `code_blocks`, and `scraped_at`; it has no dependency, framework, license, accessibility, test, or quality fields. The initial unsupported quality claims were removed in Task 8.
+- At the initial audit, README line references were stale and `CONTRIBUTING.md` contained `YOUR_USERNAME` links; Task 8 corrected README, while contributor cleanup remains in Task 10.
 - The landing-page example is generic handcrafted React/Tailwind code and does not demonstrate catalog search, provenance, dependency detection, or integration from an actual archived component.
 
-## Recommended optimization order
+## Initial Recommended Optimization Order (Tasks 1–8 Completed)
 
 1. Define realistic trigger and non-trigger prompts; establish baseline failures before editing.
 2. Replace the hard-coded library path with configuration/environment discovery and actionable failure messages.
@@ -107,10 +107,9 @@
 - `lib/catalog-config.mjs` — cross-platform config paths and ordered local catalog discovery.
 - `lib/catalog-schema.mjs` — schema constants, record/manifest validators, and metadata URL detection.
 - `tests/helpers.mjs` — deterministic temporary catalog and child-process test helpers.
-- `SKILL.md` — current skill trigger, catalog summary, and manual integration workflow.
-- `README.md` — bilingual installation and marketing documentation.
-- `CATEGORIES.md` — category counts; the quick-stat table sums to 4,360 across 47 categories.
-- `examples/landing-page.md` — current end-to-end example.
+- `README.md` — current legacy-to-cleaned installation, configuration, and CLI documentation.
+- `CATEGORIES.md` — compatibility pointer to the canonical `references/categories.md` table.
+- `examples/landing-page.md` — legacy handcrafted example pending Task 10 reconciliation.
 - `CONTRIBUTING.md` — contribution guidance with placeholder repository links.
 - `RELEASE_NOTES.md` — v1.0.0 release claims.
 
