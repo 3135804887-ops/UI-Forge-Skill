@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rename, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -406,5 +406,127 @@ test("build CLI validates paths and emits stable JSON and human summaries", asyn
     assert.equal(result.code, 1);
     assert.equal(result.stdout, "");
     assert.equal(typeof JSON.parse(result.stderr).error, "string");
+  }
+});
+
+test("rolls back the promoted catalog when backup cleanup fails", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-cleanup-failure-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const source = fileURLToPath(new URL(".", fixtureRoot));
+  const output = join(root, "catalog");
+  const backup = `${output}.backup-${process.pid}`;
+  const failedOutput = `${output}.failed-${process.pid}`;
+  await mkdir(output);
+  await writeFile(join(output, "sentinel.txt"), "old-output\n", "utf8");
+
+  await assert.rejects(
+    buildCatalog(
+      { sourcePath: source, outputPath: output },
+      {
+        promotionOperations: {
+          rm: async (target, options) => {
+            if (target === backup) {
+              const error = new Error("injected backup removal failure");
+              error.code = "EACCES";
+              throw error;
+            }
+            return rm(target, options);
+          },
+        },
+      },
+    ),
+    (error) => error?.code === "BACKUP_CLEANUP_FAILED"
+      && error?.rollback?.old_output_restored === true
+      && error?.rollback?.new_output_preserved === false,
+  );
+
+  assert.equal(await readFile(join(output, "sentinel.txt"), "utf8"), "old-output\n");
+  assert.equal(await pathExists(backup), false);
+  assert.equal(await pathExists(failedOutput), false);
+  assert.equal(await pathExists(`${output}.tmp-${process.pid}`), false);
+});
+
+test("preserves explicit recovery paths when backup restoration also fails", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-rollback-failure-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const source = fileURLToPath(new URL(".", fixtureRoot));
+  const output = join(root, "catalog");
+  const backup = `${output}.backup-${process.pid}`;
+  const failedOutput = `${output}.failed-${process.pid}`;
+  await mkdir(output);
+  await writeFile(join(output, "sentinel.txt"), "old-output\n", "utf8");
+
+  await assert.rejects(
+    buildCatalog(
+      { sourcePath: source, outputPath: output },
+      {
+        promotionOperations: {
+          rm: async (target, options) => {
+            if (target === backup) throw Object.assign(new Error("injected backup removal failure"), { code: "EACCES" });
+            return rm(target, options);
+          },
+          rename: async (from, to) => {
+            if (from === backup && to === output) throw Object.assign(new Error("injected backup restore failure"), { code: "EACCES" });
+            return rename(from, to);
+          },
+        },
+      },
+    ),
+    (error) => error?.code === "PROMOTION_ROLLBACK_FAILED"
+      && error?.rollback?.output_path === output
+      && error?.rollback?.backup_path === backup
+      && error?.rollback?.new_output_path === failedOutput
+      && error?.rollback?.old_output_restored === false
+      && error?.rollback?.new_output_preserved === true
+      && /restore failure/.test(error?.rollback?.restore_error ?? ""),
+  );
+
+  assert.equal(await pathExists(output), false);
+  assert.equal(await pathExists(backup), true);
+  assert.equal(await pathExists(failedOutput), true);
+  assert.equal(await readFile(join(backup, "sentinel.txt"), "utf8"), "old-output\n");
+});
+
+test("rejects physical source/output overlap through a directory link", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-link-safety-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const source = join(root, "source");
+  const alias = join(root, "source-alias");
+  await mkdir(source);
+  await writeFile(join(source, "Example.json"), `${JSON.stringify(legacy(), null, 2)}\n`, "utf8");
+  try {
+    await symlink(source, alias, process.platform === "win32" ? "junction" : "dir");
+  } catch (error) {
+    if (["EACCES", "EPERM", "ENOSYS"].includes(error?.code)) {
+      t.skip(`directory links unavailable: ${error.code}`);
+      return;
+    }
+    throw error;
+  }
+  const sourceBefore = await hashTree(source);
+
+  await assert.rejects(
+    buildCatalog({ sourcePath: source, outputPath: join(alias, "nested-output") }),
+    { code: "UNSAFE_OUTPUT_PATH" },
+  );
+  await assert.rejects(
+    buildCatalog({ sourcePath: source, outputPath: alias }),
+    { code: "UNSAFE_OUTPUT_PATH" },
+  );
+  await assert.rejects(
+    buildCatalog({ sourcePath: alias, outputPath: join(source, "nested-output-from-aliased-source") }),
+    { code: "UNSAFE_OUTPUT_PATH" },
+  );
+  assert.deepEqual(await hashTree(source), sourceBefore);
+});
+
+test("rejects blank, non-string, and non-file URL source paths structurally", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-source-args-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  for (const [index, sourcePath] of [undefined, null, "", "   ", 42, new URL("https://example.invalid/catalog")].entries()) {
+    await assert.rejects(
+      buildCatalog({ sourcePath, outputPath: join(root, `catalog-${index}`) }),
+      (error) => error?.code === "INVALID_SOURCE_PATH" && typeof error.message === "string",
+    );
   }
 });

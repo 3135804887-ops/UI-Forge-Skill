@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+~ Hardened catalog promotion cleanup failures to roll back the new output, restore the prior catalog, and report explicit recovery paths/state when rollback cannot finish.
+~ Canonicalized source and prospective output paths through filesystem realpaths so symlink/junction aliases cannot bypass overlap protection.
+~ Reject blank, non-string, and non-file-URL builder source paths with stable `INVALID_SOURCE_PATH` errors.
+# Review regressions use an internal second-argument filesystem dependency seam, leaving the documented `buildCatalog({ sourcePath, outputPath })` options contract unchanged.
 + Added deterministic cleaned-catalog output with exact-byte component hashes, shared-rule manifest digests, build/rejection/duplicate reports, and complete `emitted_sources` accounting.
 + Added the `build-catalog.mjs` human/JSON CLI with strict absolute, distinct, non-nested source/output path validation.
 ~ Validate every sibling temporary catalog before atomic promotion, preserve existing output on validation failure, restore backups on promotion failure, and clean successful temporary/backup paths.
