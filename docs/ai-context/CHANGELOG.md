@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added the Node 18+ zero-dependency test harness, deterministic fixture-catalog helpers, and schema version 1 runtime validation.
+~ Established stable public schema exports: `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl`.
+# Runtime metadata rejects URLs outside canonical code block source; deterministic ordering avoids locale-dependent comparisons.
 + Added an immutable 13-case bilingual UI Forge trigger matrix and recorded 19 fresh-context baseline classifications.
 # Baseline RED evidence: all seven negative cases over-triggered under the current broad frontend wording; `SKILL.md` remains unchanged.
 + Added a task-by-task TDD implementation plan for the approved first-round optimization.

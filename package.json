@@ -1,0 +1,12 @@
+{
+  "name": "ui-forge-skill",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test",
+    "ui-forge": "node scripts/ui-forge.mjs",
+    "build:catalog": "node scripts/build-catalog.mjs"
+  }
+}

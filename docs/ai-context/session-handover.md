@@ -2,6 +2,8 @@
 
 ## Task status
 
+- Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests.
+- In progress (next): implement deterministic catalog loading and platform-neutral discovery on top of the stable schema interfaces.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
 - In progress (next): rewrite the skill trigger description against the immutable baseline, then rerun the same prompt matrix as forward tests.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
@@ -13,6 +15,7 @@
 
 ## Recent decisions
 
+- Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison.
 - Freeze `tests/skill-trigger-cases.json` as the prompt matrix reused after the trigger rewrite; do not tune cases to the current classifications.
 - Treat the current repository as a prompt-driven component catalog adapter, not yet as a self-contained executable skill.
 - Preserve the component archive outside Git; inspect release assets from a temporary directory instead of committing or extracting them into the repository.
@@ -50,6 +53,8 @@
 
 ## Key files
 
+- `lib/catalog-schema.mjs` — schema constants, record/manifest validators, and metadata URL detection.
+- `tests/helpers.mjs` — deterministic temporary catalog and child-process test helpers.
 - `SKILL.md` — current skill trigger, catalog summary, and manual integration workflow.
 - `README.md` — bilingual installation and marketing documentation.
 - `CATEGORIES.md` — category counts; the quick-stat table sums to 4,360 across 47 categories.
