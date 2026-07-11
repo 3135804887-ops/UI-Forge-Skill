@@ -2,8 +2,9 @@
 
 ## Task status
 
+- Completed: implemented zero-dependency legacy-record loading, malformed JSON recovery from numerically ordered companion files, normalized-URL deduplication, deterministic merge-base selection, static code analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
+- In progress (next): build deterministic catalog filesystem output, manifest generation, reports, and atomic promotion on top of `loadLegacyRecords`.
 - Completed: added and review-hardened the zero-dependency `validate`, `search`, and `show` CLI with strict nonblank arguments, stable JSON/human output (including structured JSON usage errors), explicit related-category envelopes, shared exact-ID validation, and exit codes `0`/`1`/`2`; focused and full tests pass.
-- In progress (next): normalize and repair legacy source records for deterministic catalog building.
 - Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
 - Completed: hardened catalog integrity after review with the Task 7 manifest-digest contract, normalized safe component paths, explicit containment checks, and complete discovery diagnostics.
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
@@ -21,6 +22,11 @@
 
 ## Recent decisions
 
+- Expose `loadLegacyRecords({ sourcePath }) -> { records, report }` as the recovery/normalization boundary consumed by the future deterministic builder; it performs no output writes, manifest generation, or promotion.
+- Normalize source URLs only while grouping and hashing, retain non-clickable provider/author/slug identity, and exclude source URLs, scrape timestamps, and source paths from runtime records.
+- Represent external functional resources as sorted `sha256:` identities in metadata while preserving their full URLs only inside canonical code block text; diagnostics reference only the hash and block index.
+- Select duplicate merge bases by descending usable block count, description length, then ordinal source path; merge complementary blocks in deterministic order and deduplicate normalized content by SHA-256.
+- Assign confidence strictly from reconstruction status: complete `1`, recoverable `0.85`, incomplete `0.5`, invalid `0`; recovery or complementary duplicate code produces recoverable only after local imports resolve.
 - Treat usage and catalog-validation failures as exit `1`, catalog discovery exhaustion as exit `2`, and successful validation/search/show (including zero search results) as exit `0`.
 - Serialize search suggestions as the explicit `relatedCategories` envelope field because the augmented search-array property is deliberately non-enumerable; `show` returns the selected stored record unchanged under `component`.
 - Keep successful output on stdout and all usage, discovery, validation, and lookup errors on stderr; JSON uses two-space indentation plus one trailing newline.
@@ -72,6 +78,9 @@
 
 ## Key files
 
+- `lib/catalog-builder.mjs` — legacy scanning, recovery, URL normalization, source identity extraction, code analysis, deduplication, reconstruction status, and Task 6 build-report data.
+- `tests/catalog-builder.test.mjs` — source normalization, dependency/role analysis, no-execution safety, recovery/deduplication, report contract, URL-free metadata, and all-status coverage.
+- `tests/fixtures/source/` — minimal anonymized parsed, duplicate, companion, and truncated legacy source fixtures.
 - `scripts/ui-forge.mjs` — zero-dependency Node CLI for validation, search, exact-ID show, stable formatting, and exit-code handling.
 - `tests/catalog-cli.test.mjs` — process-level CLI coverage for JSON/human output, flags, errors, discovery diagnostics, and complete code preservation.
 - `lib/catalog-search.mjs` — Unicode query normalization, deterministic scoring/filtering/ordering, code-free summaries, and related-category suggestions.

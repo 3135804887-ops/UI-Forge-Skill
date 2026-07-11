@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
++ Added `loadLegacyRecords` as the recovery-only boundary for scanning legacy records, repairing truncated JSON from companion code, merging duplicate sources, and returning deterministic normalized records plus build-report data.
++ Added static import/require, language, role, dependency, alias, dynamic-import, unresolved-import, and external-resource analysis without evaluating component code.
++ Added minimal anonymized legacy fixtures, including a deliberately truncated `Liquid_Metal.json`, and regression coverage for normalized hashing, merge-base selection, all reconstruction statuses, source removal, and fixture immutability.
+~ Store external resource metadata as URL-free SHA-256 identities while retaining complete functional URLs only inside canonical code blocks.
+# The recovery boundary preserves all available source code and non-clickable provenance while deferring deterministic filesystem output, manifests, and atomic promotion to the next builder task.
 ~ Hardened CLI parsing against empty and whitespace-only catalogs, queries, categories, and show IDs, preventing blank explicit catalog paths from falling through to another discovery source.
 ~ Made `--json` apply to all usage failures, including malformed flags and values, with a stable structured stderr envelope.
 + Exported the shared public `isValidComponentId` schema helper and used it for record, manifest, and CLI validation.

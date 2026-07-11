@@ -1,0 +1,13 @@
+{
+  "url": "HTTPS://21st.dev/@Maker/components/Shimmer/?utm_source=fixture#demo",
+  "title": "Shimmer Button",
+  "description": "A small animated button example.",
+  "category": "button",
+  "code_blocks": [
+    {
+      "index": 0,
+      "code": "import { ShimmerButton } from \"./ShimmerButton\";\nexport function Example() { return <ShimmerButton label=\"Save\" />; }"
+    }
+  ],
+  "scraped_at": "2025-01-01T00:00:00Z"
+}

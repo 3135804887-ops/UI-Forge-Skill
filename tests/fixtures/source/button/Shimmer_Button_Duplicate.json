@@ -1,0 +1,13 @@
+{
+  "url": "https://21st.dev/@maker/components/Shimmer/",
+  "title": "Shimmer Button",
+  "description": "A complementary implementation for the animated button example.",
+  "category": "button",
+  "code_blocks": [
+    {
+      "index": 0,
+      "code": "export interface ShimmerButtonProps { label: string; }\nexport function ShimmerButton({ label }: ShimmerButtonProps) { return <button>{label}</button>; }"
+    }
+  ],
+  "scraped_at": "2025-01-02T00:00:00Z"
+}

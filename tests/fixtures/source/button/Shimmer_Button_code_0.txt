@@ -1,0 +1,2 @@
+import { ShimmerButton } from "./ShimmerButton";
+export function Example() { return <ShimmerButton label="Save" />; }
