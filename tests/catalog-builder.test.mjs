@@ -85,6 +85,15 @@ test("handles CSS and diagnoses dynamic imports without treating them as static 
   assert.ok(analysis.diagnostics.some(({ code }) => code === "DYNAMIC_IMPORT"));
 });
 
+test("treats configured-looking project aliases as local while preserving npm subpaths", () => {
+  const analysis = analyzeCodeBlocks([{
+    index: 0,
+    code: 'import { Button } from "components/ui/button"; import { cn } from "lib/utils"; import { useX } from "src/hooks/use-x"; import parse from "date-fns/parse"; export function Demo() { return <Button className={cn(useX())}>{parse}</Button>; }',
+  }]);
+  assert.deepEqual(analysis.local_imports, ["components/ui/button", "lib/utils", "src/hooks/use-x"]);
+  assert.deepEqual(analysis.dependencies, ["date-fns"]);
+});
+
 test("analyzes require calls and observable component, hook, utility, and unknown roles", () => {
   const analysis = analyzeCodeBlocks([
     { index: 0, code: 'const helper = require("helper-package/subpath"); export function Panel() { return <section />; }' },
@@ -108,6 +117,10 @@ test("deduplicates normalized code content while preserving a complete canonical
     assert.equal(result.report.merged_records, 1);
     assert.equal(result.report.duplicate_groups[0].selected_base, "example/Two.json");
     assert.deepEqual(result.report.duplicate_groups[0].source_paths, ["example/One.json", "example/Two.json"]);
+    assert.deepEqual(result.report.emitted_sources, [{
+      emitted_id: result.records[0].id,
+      source_paths: ["example/One.json", "example/Two.json"],
+    }]);
   });
 });
 
@@ -135,6 +148,12 @@ test("recovers truncated JSON from companion code and merges complementary dupli
   assert.equal(report.input_records, report.parsed_records + report.recovered_records + report.rejected_records.length);
   assert.equal(report.duplicate_groups.length, 1);
   assert.deepEqual(report.duplicate_groups[0].source_paths, [...report.duplicate_groups[0].source_paths].sort());
+  assert.deepEqual(report.emitted_sources, records.map(({ id, title }) => ({
+    emitted_id: id,
+    source_paths: title === "Liquid Metal"
+      ? ["background/Liquid_Metal.json"]
+      : ["button/Shimmer_Button.json", "button/Shimmer_Button_Duplicate.json"],
+  })));
   assert.deepEqual(records, [...records].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   assert.ok(records.every((record) => validateRecord(record).length === 0));
   assert.ok(records.every((record) => !containsMetadataUrl(record)));
@@ -190,5 +209,40 @@ test("uses non-clickable fallback source identity with a runtime diagnostic", as
     assert.deepEqual(records[0].source, { provider: "catalog.invalid", author: "unknown", slug: "fallback-item" });
     assert.ok(records[0].diagnostics.some(({ code }) => code === "SOURCE_IDENTITY_FALLBACK"));
     assert.equal(validateRecord(records[0]).length, 0);
+  });
+});
+
+test("filters malformed code blocks without losing valid blocks or stopping other records", async () => {
+  await withLegacySource({
+    "malformed/AllMalformed.json": legacy({
+      url: "https://legacy.invalid/@maker/components/all-malformed",
+      title: "All Malformed",
+      code_blocks: [null],
+    }),
+    "malformed/Mixed.json": legacy({
+      url: "https://legacy.invalid/@maker/components/mixed",
+      title: "Mixed",
+      code_blocks: [{ index: 0, code: "export function Mixed() { return <div />; }" }, null],
+    }),
+    "malformed/Other.json": legacy({
+      url: "https://legacy.invalid/@maker/components/other",
+      title: "Other",
+    }),
+  }, async (sourcePath) => {
+    const { records } = await loadLegacyRecords({ sourcePath });
+    assert.equal(records.length, 3);
+    const allMalformed = records.find(({ title }) => title === "All Malformed");
+    const mixed = records.find(({ title }) => title === "Mixed");
+    assert.equal(allMalformed.status, "invalid");
+    assert.deepEqual(allMalformed.code_blocks, []);
+    assert.equal(validateRecord(allMalformed).length, 0);
+    assert.equal(mixed.status, "complete");
+    assert.equal(mixed.code_blocks.length, 1);
+    assert.match(mixed.code_blocks[0].code, /function Mixed/);
+    assert.deepEqual(mixed.diagnostics.filter(({ code }) => code === "MALFORMED_CODE_BLOCK"), [{
+      code: "MALFORMED_CODE_BLOCK",
+      message: "Ignored malformed legacy code block at index 1.",
+    }]);
+    assert.ok(records.some(({ title, status }) => title === "Other" && status === "complete"));
   });
 });

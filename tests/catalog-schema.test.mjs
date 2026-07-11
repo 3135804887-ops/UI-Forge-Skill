@@ -73,6 +73,7 @@ test("reports exact structural errors", () => {
   const errors = validateRecord({ ...validRecord, id: "Bad ID", code_blocks: [] }, "broken.json");
   assert.ok(errors.some((x) => x.code === "INVALID_ID" && x.file === "broken.json"));
   assert.ok(errors.some((x) => x.code === "MISSING_CODE"));
+  assert.deepEqual(validateRecord({ ...validRecord, status: "invalid", confidence: 0, code_blocks: [] }), []);
 });
 
 test("validates source identity fields", () => {

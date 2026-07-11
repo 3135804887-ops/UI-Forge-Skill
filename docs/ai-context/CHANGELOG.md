@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
++ Added deterministic `emitted_sources` report mappings for every emitted singleton and merged record, ensuring every accepted legacy source path is auditable without leaking paths into runtime records.
+~ Expanded local-import analysis for common configured project roots while retaining ordinary npm/scoped subpath dependency extraction.
+~ Filter malformed legacy code-block entries before ranking/merging, preserve valid neighboring code, and emit stable `MALFORMED_CODE_BLOCK` diagnostics without aborting the catalog.
+~ Allow shared-schema `invalid` records to use an empty code-block array when recovery finds no usable code; non-invalid records still require code.
+# Review hardening makes source accountability complete and prevents one malformed block from dropping valid code or unrelated records.
 + Added `loadLegacyRecords` as the recovery-only boundary for scanning legacy records, repairing truncated JSON from companion code, merging duplicate sources, and returning deterministic normalized records plus build-report data.
 + Added static import/require, language, role, dependency, alias, dynamic-import, unresolved-import, and external-resource analysis without evaluating component code.
 + Added minimal anonymized legacy fixtures, including a deliberately truncated `Liquid_Metal.json`, and regression coverage for normalized hashing, merge-base selection, all reconstruction statuses, source removal, and fixture immutability.

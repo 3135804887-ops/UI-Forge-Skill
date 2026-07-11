@@ -2,7 +2,7 @@
 
 ## Task status
 
-- Completed: implemented zero-dependency legacy-record loading, malformed JSON recovery from numerically ordered companion files, normalized-URL deduplication, deterministic merge-base selection, static code analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
+- Completed: implemented and review-hardened zero-dependency legacy-record loading, malformed JSON/code-block recovery, normalized-URL deduplication, complete source-to-emitted report mappings, deterministic merge-base selection, project-alias-aware static analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
 - In progress (next): build deterministic catalog filesystem output, manifest generation, reports, and atomic promotion on top of `loadLegacyRecords`.
 - Completed: added and review-hardened the zero-dependency `validate`, `search`, and `show` CLI with strict nonblank arguments, stable JSON/human output (including structured JSON usage errors), explicit related-category envelopes, shared exact-ID validation, and exit codes `0`/`1`/`2`; focused and full tests pass.
 - Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
@@ -23,6 +23,9 @@
 ## Recent decisions
 
 - Expose `loadLegacyRecords({ sourcePath }) -> { records, report }` as the recovery/normalization boundary consumed by the future deterministic builder; it performs no output writes, manifest generation, or promotion.
+- Include every accepted source path in `report.emitted_sources`, including singleton records, while retaining duplicate-specific merge details separately and keeping all source paths out of runtime records.
+- Treat `src/`, `components/`, `lib/`, `hooks/`, `utils/`, `styles/`, `assets/`, `app/`, and `pages/` subpaths as configured-looking local imports; other bare/scoped package subpaths remain install dependencies.
+- Filter malformed legacy code-block entries before ranking and merging, attach deterministic `MALFORMED_CODE_BLOCK` diagnostics, preserve every valid neighboring block, and allow `invalid` runtime records to have an empty code-block array when no usable source remains.
 - Normalize source URLs only while grouping and hashing, retain non-clickable provider/author/slug identity, and exclude source URLs, scrape timestamps, and source paths from runtime records.
 - Represent external functional resources as sorted `sha256:` identities in metadata while preserving their full URLs only inside canonical code block text; diagnostics reference only the hash and block index.
 - Select duplicate merge bases by descending usable block count, description length, then ordinal source path; merge complementary blocks in deterministic order and deduplicate normalized content by SHA-256.
