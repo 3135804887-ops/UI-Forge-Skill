@@ -8,7 +8,9 @@
 ![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=flat-square&logo=typescript)
 
-A powerful Claude Code skill providing instant access to 4360+ production-ready React components across 47 categories.
+A powerful AI coding assistant skill providing instant access to 4360+ production-ready React components across 47 categories.
+
+Compatible with Claude Code, Cursor, Windsurf, and other AI-powered development tools.
 
 [English](#english) | [中文文档](#中文文档)
 
@@ -20,7 +22,9 @@ A powerful Claude Code skill providing instant access to 4360+ production-ready 
 
 ### Overview
 
-UI Forge is a comprehensive component library skill that helps developers build beautiful, modern user interfaces faster. When building frontend applications, Claude will automatically suggest and integrate the perfect components for your needs.
+UI Forge is a comprehensive component library skill that helps developers build beautiful, modern user interfaces faster. When building frontend applications, your AI assistant will automatically suggest and integrate the perfect components for your needs.
+
+Compatible with Claude Code, Cursor, Windsurf, and other AI coding assistants that support skill/prompt systems.
 
 ### Features
 
@@ -53,8 +57,10 @@ cd UI-Forge-Skill
 # macOS/Linux
 cp -r . ~/.claude/skills/ui-forge
 
-# Windows
+# Windows (Claude Code)
 xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
+
+# For Cursor/Windsurf - adapt path to your AI assistant's skill directory
 ```
 
 Method 2: Download Release
@@ -209,7 +215,9 @@ MIT License - see LICENSE for details.
 
 ### 概述
 
-UI Forge 是一个综合性组件库技能，帮助开发者更快速地构建美观、现代的用户界面。在构建前端应用时，Claude 会自动建议并集成最适合你需求的组件。
+UI Forge 是一个综合性组件库技能，帮助开发者更快速地构建美观、现代的用户界面。在构建前端应用时，你的 AI 助手会自动建议并集成最适合你需求的组件。
+
+兼容 Claude Code、Cursor、Windsurf 等支持技能/提示词系统的 AI 编码助手。
 
 ### 特性
 
@@ -242,8 +250,10 @@ cd UI-Forge-Skill
 # macOS/Linux
 cp -r . ~/.claude/skills/ui-forge
 
-# Windows
+# Windows (Claude Code)
 xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
+
+# For Cursor/Windsurf - adapt path to your AI assistant's skill directory
 ```
 
 方式二：下载发行版
