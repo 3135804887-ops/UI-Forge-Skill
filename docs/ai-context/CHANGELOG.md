@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
++ Added deterministic cleaned-catalog output with exact-byte component hashes, shared-rule manifest digests, build/rejection/duplicate reports, and complete `emitted_sources` accounting.
++ Added the `build-catalog.mjs` human/JSON CLI with strict absolute, distinct, non-nested source/output path validation.
+~ Validate every sibling temporary catalog before atomic promotion, preserve existing output on validation failure, restore backups on promotion failure, and clean successful temporary/backup paths.
+~ Ignored generated catalog distributions and checksum release artifacts.
+# Reports remain outside the runtime manifest while recording counts, unresolved imports, external asset identities, rejected records, duplicate merge bases, and the catalog content digest.
 + Added deterministic `emitted_sources` report mappings for every emitted singleton and merged record, ensuring every accepted legacy source path is auditable without leaking paths into runtime records.
 ~ Expanded local-import analysis for common configured project roots while retaining ordinary npm/scoped subpath dependency extraction.
 ~ Filter malformed legacy code-block entries before ranking/merging, preserve valid neighboring code, and emit stable `MALFORMED_CODE_BLOCK` diagnostics without aborting the catalog.

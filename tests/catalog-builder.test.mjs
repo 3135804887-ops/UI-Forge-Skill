@@ -1,17 +1,55 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   analyzeCodeBlocks,
+  buildCatalog,
   extractSourceIdentity,
   loadLegacyRecords,
   normalizeSourceUrl,
 } from "../lib/catalog-builder.mjs";
+import { computeManifestDigest } from "../lib/catalog-integrity.mjs";
 import { containsMetadataUrl, validateRecord } from "../lib/catalog-schema.mjs";
+import { runNode } from "./helpers.mjs";
 
 const fixtureRoot = new URL("./fixtures/source/", import.meta.url);
+const buildCli = fileURLToPath(new URL("../scripts/build-catalog.mjs", import.meta.url));
+
+async function listFiles(root) {
+  const files = [];
+  async function visit(directory, prefix = "") {
+    const entries = await readdir(directory, { withFileTypes: true });
+    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    for (const entry of entries) {
+      const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) await visit(join(directory, entry.name), relativePath);
+      else if (entry.isFile()) files.push(relativePath);
+    }
+  }
+  await visit(root);
+  return files;
+}
+
+async function hashTree(root) {
+  return Object.fromEntries(await Promise.all((await listFiles(root)).map(async (relativePath) => [
+    relativePath,
+    createHash("sha256").update(await readFile(join(root, relativePath))).digest("hex"),
+  ])));
+}
+
+async function pathExists(path) {
+  try {
+    await stat(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
 
 async function withLegacySource(records, callback) {
   const root = await mkdtemp(join(tmpdir(), "ui-forge-builder-"));
@@ -245,4 +283,128 @@ test("filters malformed code blocks without losing valid blocks or stopping othe
     }]);
     assert.ok(records.some(({ title, status }) => title === "Other" && status === "complete"));
   });
+});
+
+test("builds deterministic URL-free output, manifest, and complete reports", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-output-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const fixturePath = fileURLToPath(new URL(".", fixtureRoot));
+  const sourceBefore = await hashTree(fixturePath);
+  const outputA = join(root, "catalog-a");
+  const outputB = join(root, "catalog-b");
+
+  const first = await buildCatalog({ sourcePath: fixtureRoot, outputPath: outputA });
+  const second = await buildCatalog({ sourcePath: fixtureRoot, outputPath: outputB });
+
+  assert.equal(first.manifest.digest, second.manifest.digest);
+  assert.deepEqual(await hashTree(outputA), await hashTree(outputB));
+  assert.equal((await listFiles(outputA)).some((file) => /_code_\d+\.txt$/.test(file)), false);
+  assert.deepEqual(await hashTree(fixturePath), sourceBefore);
+  assert.equal(await pathExists(`${outputA}.tmp-${process.pid}`), false);
+  assert.equal(await pathExists(`${outputA}.backup-${process.pid}`), false);
+
+  const manifest = JSON.parse(await readFile(join(outputA, "manifest.json"), "utf8"));
+  assert.equal(manifest.component_count, 2);
+  assert.equal(manifest.digest, computeManifestDigest(manifest.files));
+  assert.deepEqual(manifest.files, [...manifest.files].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  for (const entry of manifest.files) {
+    const contents = await readFile(join(outputA, "components", entry.path));
+    assert.equal(createHash("sha256").update(contents).digest("hex"), entry.sha256);
+    const record = JSON.parse(contents);
+    const metadata = { ...record, code_blocks: record.code_blocks.map(({ code: _code, ...block }) => block) };
+    assert.doesNotMatch(JSON.stringify(metadata), /https?:\/\//i);
+  }
+
+  const buildReport = JSON.parse(await readFile(join(outputA, "reports", "build-report.json"), "utf8"));
+  const rejected = JSON.parse(await readFile(join(outputA, "reports", "rejected-records.json"), "utf8"));
+  const duplicates = JSON.parse(await readFile(join(outputA, "reports", "duplicate-groups.json"), "utf8"));
+  assert.deepEqual({
+    input: buildReport.input_records,
+    parsed: buildReport.parsed_records,
+    repaired: buildReport.repaired_records,
+    merged: buildReport.merged_records,
+    emitted: buildReport.emitted_records,
+    rejected: buildReport.rejected_records,
+    componentFiles: buildReport.component_files,
+    digest: buildReport.content_digest,
+  }, { input: 3, parsed: 2, repaired: 1, merged: 1, emitted: 2, rejected: 0, componentFiles: 2, digest: manifest.digest });
+  assert.deepEqual(buildReport.emitted_sources, first.report.emitted_sources);
+  assert.deepEqual(rejected, []);
+  assert.equal(duplicates.length, 1);
+  assert.equal(duplicates[0].selected_base, "button/Shimmer_Button_Duplicate.json");
+});
+
+test("reports rejected records and preserves existing output when temporary validation fails", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-failure-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const output = join(root, "catalog");
+  await mkdir(output);
+  await writeFile(join(output, "sentinel.txt"), "keep\n", "utf8");
+
+  await withLegacySource({
+    "bad/Missing.json": { title: "Missing URL", description: "No source.", category: "bad", code_blocks: [] },
+    "bad/MetadataUrl.json": legacy({ description: "Leaked https://metadata.invalid/value" }),
+  }, async (sourcePath) => {
+    await assert.rejects(
+      buildCatalog({ sourcePath, outputPath: output }),
+      (error) => error?.code === "CATALOG_VALIDATION_FAILED" && error?.issues?.[0]?.code === "METADATA_URL",
+    );
+  });
+
+  assert.equal(await readFile(join(output, "sentinel.txt"), "utf8"), "keep\n");
+  assert.equal(await pathExists(`${output}.tmp-${process.pid}`), false);
+  assert.equal(await pathExists(`${output}.backup-${process.pid}`), false);
+
+  await withLegacySource({
+    "bad/Missing.json": { title: "Missing URL", description: "No source.", category: "bad", code_blocks: [] },
+    "good/Example.json": legacy(),
+  }, async (sourcePath) => {
+    const result = await buildCatalog({ sourcePath, outputPath: output });
+    assert.equal(result.report.rejected_records.length, 1);
+  });
+  assert.deepEqual(JSON.parse(await readFile(join(output, "reports", "rejected-records.json"), "utf8")), [{
+    source_path: "bad/Missing.json",
+    code: "MISSING_REQUIRED_METADATA",
+    message: "legacy record requires non-empty url",
+  }]);
+});
+
+test("build CLI validates paths and emits stable JSON and human summaries", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-cli-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const source = resolve(fileURLToPath(new URL(".", fixtureRoot)));
+  const output = join(root, "catalog");
+  assert.equal(isAbsolute(source), true);
+
+  const jsonResult = await runNode([buildCli, "--source", source, "--output", output, "--json"]);
+  assert.equal(jsonResult.code, 0);
+  assert.equal(jsonResult.stderr, "");
+  assert.deepEqual(JSON.parse(jsonResult.stdout), {
+    parsed: 2,
+    repaired: 1,
+    merged: 1,
+    emitted: 2,
+    rejected: 0,
+    component_files: 2,
+    manifest_digest: JSON.parse(await readFile(join(output, "manifest.json"), "utf8")).digest,
+  });
+  assert.equal(jsonResult.stdout.endsWith("\n"), true);
+
+  const humanOutput = join(root, "catalog-human");
+  const humanResult = await runNode([buildCli, "--source", source, "--output", humanOutput]);
+  assert.equal(humanResult.code, 0);
+  assert.equal(humanResult.stderr, "");
+  assert.match(humanResult.stdout, /^Parsed: 2\nRepaired: 1\nMerged: 1\nEmitted: 2\nRejected: 0\nComponent files: 2\nManifest digest: [0-9a-f]{64}\n$/);
+
+  for (const args of [
+    ["--source", "relative", "--output", output],
+    ["--source", source, "--output", "relative"],
+    ["--source", source, "--output", source],
+    ["--source", source, "--output", join(source, "nested")],
+  ]) {
+    const result = await runNode([buildCli, ...args, "--json"]);
+    assert.equal(result.code, 1);
+    assert.equal(result.stdout, "");
+    assert.equal(typeof JSON.parse(result.stderr).error, "string");
+  }
 });
