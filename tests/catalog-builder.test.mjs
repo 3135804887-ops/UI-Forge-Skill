@@ -316,6 +316,24 @@ test("filters malformed code blocks without losing valid blocks or stopping othe
   });
 });
 
+test("preserves legacy string code blocks used by the v1.0 catalog", async () => {
+  const originalCode = '"use client";\n\nexport function LegacyButton() { return <button />; }';
+  await withLegacySource({
+    "button/Legacy_Button.json": legacy({
+      url: "https://legacy.invalid/@maker/components/legacy-button",
+      title: "Legacy Button",
+      code_blocks: [originalCode],
+    }),
+  }, async (sourcePath) => {
+    const { records } = await loadLegacyRecords({ sourcePath });
+    assert.equal(records.length, 1);
+    assert.equal(records[0].status, "complete");
+    assert.equal(records[0].code_blocks.length, 1);
+    assert.equal(records[0].code_blocks[0].code, originalCode);
+    assert.equal(records[0].diagnostics.some(({ code }) => code === "MALFORMED_CODE_BLOCK"), false);
+  });
+});
+
 test("builds deterministic URL-free output, manifest, and complete reports", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "ui-forge-build-output-"));
   t.after(() => rm(root, { recursive: true, force: true }));
