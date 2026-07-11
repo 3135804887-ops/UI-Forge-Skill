@@ -66,24 +66,31 @@ Method 2: Download Release
 
 Important: The skill requires component files to be present on your system.
 
-Component Library Path: F:\爬虫\21st_components_full\
+Download the component library from Releases and extract to a local directory.
 
-For macOS/Linux users, update the path in SKILL.md:
+Update the library path in SKILL.md (around line 96):
 
 ```markdown
 ## Component Library Location
 
-All components are stored at: /your/custom/path/
+All components are stored at: /path/to/ui-forge-components/
+```
+
+Example paths:
+
+```bash
+# Windows
+C:\UIForge\components\
+
+# macOS/Linux  
+~/ui-forge/components/
 ```
 
 Verify Installation:
 
 ```bash
-# Windows
-dir F:\爬虫\21st_components_full\
-
-# macOS/Linux  
-ls /your/custom/path/
+# Check if components directory exists and contains 47 category folders
+ls /path/to/ui-forge-components/
 ```
 
 You should see 47 category directories (button, card, hero, etc.)
@@ -248,24 +255,31 @@ xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
 
 重要：技能需要组件文件存在于你的系统中。
 
-组件库路径：F:\爬虫\21st_components_full\
+从 Releases 下载组件库并解压到本地目录。
 
-macOS/Linux 用户需要在 SKILL.md 中更新路径：
+在 SKILL.md 中更新组件库路径（约第 96 行）：
 
 ```markdown
 ## Component Library Location
 
-All components are stored at: /your/custom/path/
+All components are stored at: /path/to/ui-forge-components/
+```
+
+示例路径：
+
+```bash
+# Windows
+C:\UIForge\components\
+
+# macOS/Linux  
+~/ui-forge/components/
 ```
 
 验证安装：
 
 ```bash
-# Windows
-dir F:\爬虫\21st_components_full\
-
-# macOS/Linux  
-ls /your/custom/path/
+# 检查组件目录是否存在并包含 47 个分类文件夹
+ls /path/to/ui-forge-components/
 ```
 
 你应该能看到 47 个分类目录（button、card、hero 等）

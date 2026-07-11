@@ -77,6 +77,8 @@ The library contains 47 categories with the following distribution:
 
 All components are stored at: `F:\爬虫\21st_components_full\`
 
+Note: Update this path to match your local component library installation.
+
 Each category has its own directory containing:
 - `.json` files with component metadata
 - `_code_*.txt` files with actual component code
