@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: closed-world catalog packaging now derives its allowlist from the validated manifest plus the three fixed reports; rejects extra/missing/non-regular/linked entries and non-canonical paths; canonicalizes package paths physically; preserves CLI recovery state; and keeps the formal ZIP hash unchanged.
 - Completed: whole-branch status-consistency hardening now rejects confidence mismatches, unresolved-import diagnostics on complete/recoverable records, missing unresolved-import evidence on incomplete records, and code on invalid records. The builder reuses the schema-owned derivation/mapping; focused tests pass 60/60, its full-suite checkpoint passes 98/98, and the real 3,455-component catalog validates with no errors or warnings.
 - Completed: Task 10 added and review-hardened an automated legacy-to-build-to-validate/search/show-to-package scenario. Four distinct subprocess catalogs prove discovery precedence; exact code bytes/order/newline behavior, incomplete filtering, asset hashing, and generated/original isolation are asserted. Cross-platform `npm run check` and Windows/macOS/Linux CI cover Node 18/20/22; the full suite passes 93/93.
 - Completed: two independent forward scenarios used the full cleaned catalog. The read-only selector chose `button/motion-button--64c491c2` only after explicitly including incomplete records and reported its missing implementation honestly; the reconstruction scenario preserved `button/animated-button--02ab4c4a` original code outside Git, labeled every generated file, and passed the offline structural verifier. It did not run a JSX compiler, React runtime, TypeScript compiler, or bundler.
@@ -31,6 +32,10 @@
 
 ## Recent decisions
 
+- Treat the package as a closed world: require `manifest.json` and every exact `components/<manifest path>` entry; allow only optional `reports/build-report.json`, `reports/duplicate-groups.json`, and `reports/rejected-records.json`; reject everything else.
+- Require canonical forward-slash manifest paths with no backslash, empty, `.`, or `..` segment, and require each final component realpath to remain under a canonical real `components/` directory without symlink/junction segments.
+- Canonicalize package source and prospective ZIP/checksum paths through realpath or the nearest existing physical ancestor before containment and distinctness checks.
+- Use normalized ordinal title comparison for deterministic search ties and preserve package promotion `state`/`recovery_paths` in JSON error envelopes.
 - Treat status as a schema invariant coupled to confidence, code presence, and `UNRESOLVED_LOCAL_IMPORT`: complete=`1`/code/forbid unresolved, recoverable=`0.85`/code/forbid unresolved, incomplete=`0.5`/code/require unresolved, invalid=`0`/no code/forbid unresolved. Keep the mapping and derivation in `catalog-schema`; builders and validators must reuse it rather than copy it.
 - Use `npm run check` as the platform-neutral repository validation entry and run it in CI on Windows, macOS, and Linux starting at Node 18; keep it shell-neutral as `node --test`.
 - Treat empty default search for animated buttons as truthful status filtering, not a search failure. Assistants may retry with `--include-incomplete`, but must preserve diagnostics and label missing implementation code as generated reconstruction.

@@ -50,7 +50,12 @@ export async function runPackageCli(rawArgs, io = process, internalDependencies 
     io.stdout.write(options.json ? `${JSON.stringify(result, null, 2)}\n` : human(result));
     return 0;
   } catch (error) {
-    if (wantsJson) io.stderr.write(`${JSON.stringify({ error: error.message, code: error.code ?? "PACKAGE_FAILED", usage: USAGE }, null, 2)}\n`);
+    if (wantsJson) {
+      const envelope = { error: error.message, code: error.code ?? "PACKAGE_FAILED", usage: USAGE };
+      if (error.state !== undefined) envelope.state = error.state;
+      if (error.recovery_paths !== undefined) envelope.recovery_paths = error.recovery_paths;
+      io.stderr.write(`${JSON.stringify(envelope, null, 2)}\n`);
+    }
     else io.stderr.write(`Error: ${error.message}\nUsage: ${USAGE}\n`);
     return 1;
   }

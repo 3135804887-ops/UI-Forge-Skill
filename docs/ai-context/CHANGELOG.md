@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
++ Hardened catalog packaging to a validated-manifest closed world: only `manifest.json`, exact manifest component files, and the three fixed builder reports may enter the ZIP.
+~ Reject non-canonical manifest paths, symlink/junction and non-regular component entries, and physical source/output/checksum overlap through aliased ancestors.
+~ Preserve package promotion `state` and `recovery_paths` in CLI JSON failures and replace locale collation with normalized ordinal search ordering.
+# Security hardening preserves the formal 3,459-entry ZIP byte-for-byte: 44,221,247 bytes and SHA-256 `da9110312036932c6e861cc1741710775280a76093a54a16894c15f238efaa91`.
 + Added schema, loader, and CLI regressions that reject mismatched reconstruction status, confidence, code presence, and unresolved-import diagnostics.
 ~ Centralized the four reconstruction-status invariants in `catalog-schema` and made the builder derive status and confidence from that single contract.
 # Shared schema contract: complete=`1`, recoverable=`0.85`, incomplete=`0.5`, invalid=`0`; only incomplete requires `UNRESOLVED_LOCAL_IMPORT`, and invalid records forbid code.

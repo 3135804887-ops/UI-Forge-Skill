@@ -102,7 +102,7 @@ test("rejects traversal and absolute manifest paths", async (t) => {
   }
 });
 
-test("normalizes separators for a valid nested component path", async (t) => {
+test("loads a canonical nested component path", async (t) => {
   const root = await withCatalog(t);
   const manifestFile = path.join(root, "manifest.json");
   const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
@@ -110,7 +110,7 @@ test("normalizes separators for a valid nested component path", async (t) => {
   const nestedDirectory = path.join(root, "components", "nested");
   await mkdir(nestedDirectory, { recursive: true });
   await rename(originalFile, path.join(nestedDirectory, "alpha.json"));
-  manifest.files[0].path = "nested\\alpha.json";
+  manifest.files[0].path = "nested/alpha.json";
   manifest.digest = computeManifestDigest(manifest.files);
   await writeJson(manifestFile, manifest);
 
