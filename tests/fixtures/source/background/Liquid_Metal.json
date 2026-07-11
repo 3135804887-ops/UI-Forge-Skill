@@ -1,0 +1,9 @@
+{
+  "url": "https://21st.dev/@Artist/components/liquid-metal",
+  "title": "Liquid Metal",
+  "description": "A reflective animated background.",
+  "category": "background",
+  "code_blocks": [
+    {
+      "index": 0,
+      "code": "export function LiquidMetal() {

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {"id":"en-explicit-forge","prompt":"Use UI Forge to find an animated pricing card.","expected":true},
+    {"id":"en-existing-component","prompt":"Find three ready-made React magnetic button components I can reuse.","expected":true},
+    {"id":"en-category-options","prompt":"What existing shader background components are available?","expected":true},
+    {"id":"en-generic-page","prompt":"Build a React landing page for my SaaS.","expected":false},
+    {"id":"en-debug","prompt":"Fix the submit bug in this React form.","expected":false},
+    {"id":"en-figma-review","prompt":"Review this Figma dashboard design.","expected":false},
+    {"id":"en-vue-migration","prompt":"Migrate this Vue page to React.","expected":false},
+    {"id":"en-vue-category-options","prompt":"What existing Vue modal components are available?","expected":false},
+    {"id":"en-swiftui-category-options","prompt":"Find three ready-made SwiftUI card components I can reuse.","expected":false},
+    {"id":"en-html-category-options","prompt":"Show me existing native HTML accordion component options.","expected":false},
+    {"id":"zh-explicit-forge","prompt":"使用 UI Forge 找一个带光效的按钮。","expected":true},
+    {"id":"zh-existing-component","prompt":"帮我挑选三个可以复用的现成 React 定价卡片。","expected":true},
+    {"id":"zh-category-options","prompt":"这个组件库里有哪些 shader background？","expected":true},
+    {"id":"zh-generic-page","prompt":"帮我写一个 React 管理后台页面。","expected":false},
+    {"id":"zh-debug","prompt":"修复这个 React 弹窗关闭后状态没有重置的问题。","expected":false},
+    {"id":"zh-vue-category-options","prompt":"这个 Vue 组件库里有哪些现成的 modal 选项？","expected":false},
+    {"id":"zh-swiftui-implementation","prompt":"帮我用 SwiftUI 实现一个现成卡片样式。","expected":false},
+    {"id":"zh-html","prompt":"写一个原生 HTML 登录页。","expected":false}
+  ]
+}

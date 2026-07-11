@@ -10,6 +10,8 @@ Thumbs.db
 # Editor files
 .vscode/
 .idea/
+.codegraph/
+.worktrees/
 *.sublime-project
 *.sublime-workspace
 
@@ -28,3 +30,8 @@ tmp/
 # Users should download separately
 21st_components_full/
 components_library/
+
+# Generated UI Forge catalogs and release artifacts
+dist/
+*.ui-forge-catalog.zip
+*.ui-forge-catalog.zip.sha256
