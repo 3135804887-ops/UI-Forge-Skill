@@ -76,6 +76,7 @@ test("landing-page example is a reproducible catalog reconstruction walkthrough"
   assert.match(example, /default search.*incomplete/i);
   assert.match(example, /--include-incomplete/);
   assert.match(example, /button\/motion-button--64c491c2/);
+  assert.match(example, /suggested path: `examples\/demo-demo\.jsx`/);
   assert.match(example, /status.*incomplete.*confidence.*0\.5/is);
   assert.match(example, /UNRESOLVED_LOCAL_IMPORT/);
   assert.match(example, /222ba53d131653ad042862610f0ca860622f312e020d943520269b0aa281e1ae/);

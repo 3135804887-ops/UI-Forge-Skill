@@ -2,6 +2,8 @@
 
 ## 2026-07-11
 
+~ Corrected the Motion Button example to its observed `examples/demo-demo.jsx` suggested path and pinned the real ID/path in static documentation tests.
+~ Standardized handover evidence as an offline structural verifier and explicitly excluded JSX, React runtime, TypeScript, and bundler execution.
 + Hardened the real-world subprocess regression with four distinguishable catalogs proving CLI/environment/nearest-project precedence, default incomplete filtering, exact ordered code-block bytes, functional-resource hashes, and generated/original filesystem isolation.
 ~ Replaced the handcrafted landing-page claims with a reproducible full-catalog `validate → search → show` example for `button/motion-button--64c491c2`, including incomplete status, code hash, diagnostics, and reconstruction boundaries.
 ~ Relabeled the external fixture's `build`/`typecheck` scripts as an offline structural verifier and explicitly excluded JSX, React runtime, TypeScript, bundler, and browser evidence.

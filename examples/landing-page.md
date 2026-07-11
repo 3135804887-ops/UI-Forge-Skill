@@ -45,7 +45,7 @@ Observed inventory:
 - unresolved local import: `../components/ui/motion-button`
 - diagnostic: `UNRESOLVED_LOCAL_IMPORT`
 - code blocks: one JSX `usage` block; no implementation block
-- suggested path: unavailable
+- suggested path: `examples/demo-demo.jsx`
 - original code SHA-256: `222ba53d131653ad042862610f0ca860622f312e020d943520269b0aa281e1ae`
 
 The hash summarizes the observed block without duplicating its source here. The missing implementation means this is not an exact restoration.
