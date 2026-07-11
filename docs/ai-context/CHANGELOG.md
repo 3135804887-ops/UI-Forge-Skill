@@ -2,6 +2,12 @@
 
 ## 2026-07-11
 
++ Added a concise platform-neutral UI Forge skill entry, progressive configuration/catalog/category/integration references, and Codex/Claude Code thin-adapter documentation.
++ Added Codex `agents/openai.yaml` metadata plus static regressions for the narrow trigger, reference routing, adapter CLI reuse, portable paths, and unsupported quality claims.
+~ Replaced broad automatic frontend activation with explicit ready-made React component discovery/reuse or explicit UI Forge activation.
+~ Reconciled installation and usage documentation with Node 18+, the separately installed local catalog, deterministic CLI, and real build artifact model.
+- Removed hard-coded personal catalog paths, platform pseudo-tool syntax, duplicate category documentation, stale line references, unsupported `.skill` installation claims, and unevidenced quality claims.
+# `SKILL.md` now progressively discloses detail while preserving all catalog code blocks as the primary reconstruction input; platform adapters do not fork core behavior.
 ~ Treat post-promotion backup cleanup failures as non-fatal warnings, retaining the complete promoted catalog and any residual backup recovery material without unsafe rollback from a possibly partial backup.
 ~ Canonicalized source and prospective output paths through filesystem realpaths so symlink/junction aliases cannot bypass overlap protection.
 ~ Reject blank, non-string, and non-file-URL builder source paths with stable `INVALID_SOURCE_PATH` errors.

@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: rewrote `SKILL.md` as a narrow platform-neutral entry, moved detailed guidance into progressive references, added Codex/Claude Code thin adapters and Codex metadata, reconciled public installation/CLI docs, and added static skill regressions; static, quick validation, and full tests pass, and a fresh-context evaluator matched all 13 frozen trigger labels.
 - Completed: implemented and review-hardened zero-dependency legacy-record loading, malformed JSON/code-block recovery, normalized-URL deduplication, complete source-to-emitted report mappings, deterministic merge-base selection, project-alias-aware static analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
 - Completed: added and review-hardened deterministic catalog filesystem output, shared-rule manifest generation, auditable reports, realpath-aware source/output containment, validation-gated atomic promotion, non-fatal post-promotion cleanup warnings, and an absolute-path build CLI; focused and full tests pass.
 - In progress (next): rewrite the skill with progressive disclosure and add portable assistant adapters.
@@ -23,6 +24,10 @@
 
 ## Recent decisions
 
+- Keep `SKILL.md` below 650 words with only the trigger boundary, validate/search/show integration workflow, reconstruction preservation rule, direct reference routing, and common failure handling.
+- Make `references/categories.md` the only hand-maintained category table; `CATEGORIES.md` is a compatibility pointer rather than a duplicate count source.
+- Limit adapters to install location, invocation syntax, and assistant metadata while requiring both Codex and Claude Code to invoke `node scripts/ui-forge.mjs` and use the same discovery configuration.
+- Preserve official assistant documentation links only in adapter documentation; keep runtime catalog metadata URL-free and retain functional URLs only inside component code.
 - Expose `loadLegacyRecords({ sourcePath }) -> { records, report }` as the recovery/normalization boundary consumed by the future deterministic builder; it performs no output writes, manifest generation, or promotion.
 - Expose `buildCatalog({ sourcePath, outputPath }) -> { manifest, report, buildReport, outputPath, warnings }`; component JSON is written in sorted ID order, validated in a sibling temporary directory, and only then promoted over an existing output through a sibling backup.
 - Treat source/output overlap in either direction as unsafe in the builder; the CLI additionally requires both paths to be absolute and rejects output nested in source before scanning.
@@ -87,6 +92,10 @@
 
 ## Key files
 
+- `SKILL.md` — narrow trigger and concise platform-neutral catalog-selection/integration workflow.
+- `references/` — progressively disclosed configuration, format, category, and integration guidance.
+- `adapters/` and `agents/openai.yaml` — thin Codex/Claude Code integration documentation and Codex display policy.
+- `tests/skill-files.test.mjs` — static trigger, portability, adapter, metadata, and unsupported-claim regressions.
 - `lib/catalog-builder.mjs` — legacy scanning, recovery, URL normalization, source identity extraction, code analysis, deduplication, reconstruction status, and Task 6 build-report data.
 - `scripts/build-catalog.mjs` — deterministic catalog build CLI with stable human/JSON summaries and strict absolute path validation.
 - `tests/catalog-builder.test.mjs` — source normalization, dependency/role analysis, no-execution safety, recovery/deduplication, report contract, URL-free metadata, and all-status coverage.

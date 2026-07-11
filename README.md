@@ -1,413 +1,61 @@
-# UI Forge - Professional Component Library Skill
+# UI Forge
 
-<div align="center">
+UI Forge is a platform-neutral skill and zero-dependency Node CLI for finding and reconstructing ready-made React UI components from a separately installed local catalog. It preserves complete stored code and reports dependencies, unresolved local imports, external-resource identities, completeness, and diagnostics instead of making unsupported quality claims.
 
-![Components](https://img.shields.io/badge/Components-4360+-blue?style=flat-square)
-![Categories](https://img.shields.io/badge/Categories-47-green?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
-![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=flat-square&logo=typescript)
+## Requirements
 
-A powerful AI coding assistant skill providing instant access to 4360+ production-ready React components across 47 categories.
+- Node.js 18 or newer
+- This repository installed as a complete skill directory
+- A cleaned UI Forge catalog extracted to a local directory
 
-Compatible with Claude Code, Cursor, Windsurf, and other AI-powered development tools.
+The catalog is a separate release asset, not committed to this repository and not a `.skill` installer. Building a catalog from the legacy source is reproducible with the included builder.
 
-[English](#english) | [中文文档](#中文文档)
+## Install the skill
 
-</div>
+Clone or copy the complete repository into your assistant's skills location. Do not copy only `SKILL.md`; the skill depends on adjacent `scripts/`, `lib/`, and `references/` directories.
 
----
+- Codex: follow [adapters/codex.md](adapters/codex.md).
+- Claude Code: follow [adapters/claude-code.md](adapters/claude-code.md).
+- Other platforms: implement the narrow contract in [adapters/README.md](adapters/README.md) without forking the core workflow.
 
-## English
+## Install and configure the local catalog
 
-### Overview
-
-UI Forge is a comprehensive component library skill that helps developers build beautiful, modern user interfaces faster. When building frontend applications, your AI assistant will automatically suggest and integrate the perfect components for your needs.
-
-Compatible with Claude Code, Cursor, Windsurf, and other AI coding assistants that support skill/prompt systems.
-
-### Features
-
-Massive Library
-- 4360+ production-ready components
-- 47 organized categories
-- 154MB of high-quality code
-
-Smart Integration
-- AI-powered component discovery
-- Context-aware recommendations
-- Complete code with dependencies
-- Customization guidance
-
-Production Ready
-- Modern React patterns
-- TypeScript support
-- Tailwind CSS styling
-- Responsive design
-- Accessibility built-in
-
-### Installation
-
-Method 1: Clone Repository
+Extract the cleaned catalog asset to a directory you control, then use one of the discovery mechanisms:
 
 ```bash
-git clone git@github.com:3135804887-ops/UI-Forge-Skill.git
-cd UI-Forge-Skill
-
-# macOS/Linux
-cp -r . ~/.claude/skills/ui-forge
-
-# Windows (Claude Code)
-xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
-
-# For Cursor/Windsurf - adapt path to your AI assistant's skill directory
+node scripts/ui-forge.mjs validate --catalog "/path/to/catalog" --json
 ```
 
-Method 2: Download Release
+Or set `UI_FORGE_CATALOG`, add a project `.ui-forge.json`, add a user config, or use a documented common install directory. See [references/configuration.md](references/configuration.md) for precedence and Windows, macOS, and Linux locations.
 
-1. Download the latest .skill package from Releases
-2. Install via Claude Code: /skills install ui-forge.skill
-
-### Component Library Setup
-
-Important: The skill requires component files to be present on your system.
-
-Download the component library from Releases and extract to a local directory.
-
-Update the library path in SKILL.md (around line 96):
-
-```markdown
-## Component Library Location
-
-All components are stored at: /path/to/ui-forge-components/
-```
-
-Example paths:
+## CLI
 
 ```bash
-# Windows
-C:\UIForge\components\
-
-# macOS/Linux  
-~/ui-forge/components/
+node scripts/ui-forge.mjs validate [--catalog PATH] [--json]
+node scripts/ui-forge.mjs search "animated button" [--category button] [--limit 3] [--include-incomplete] [--catalog PATH] [--json]
+node scripts/ui-forge.mjs show "button/component--digest" [--catalog PATH] [--json]
 ```
 
-Verify Installation:
+`show` returns every original stored code block. If a record is incomplete, consumers must preserve those blocks and clearly distinguish generated reconstruction.
+
+## Build a cleaned catalog
+
+Use absolute, separate source and output paths:
 
 ```bash
-# Check if components directory exists and contains 47 category folders
-ls /path/to/ui-forge-components/
+node scripts/build-catalog.mjs --source "/absolute/legacy/source" --output "/absolute/clean/catalog" --json
 ```
 
-You should see 47 category directories (button, card, hero, etc.)
+The builder repairs recoverable data, groups duplicates by source identity, stores code once, removes runtime metadata URLs, emits deterministic reports and manifest bytes, validates temporary output, and promotes it atomically. It never edits the legacy source in place.
 
-### Usage Examples
-
-Building a Landing Page
-
-```
-User: "I need to build a landing page for my SaaS product"
-
-Claude: I'll help you build that with UI Forge components!
-Let me suggest:
-- Hero section with gradient background
-- Feature showcase cards
-- Pricing comparison table
-- Testimonials carousel
-- CTA section
-
-[provides complete implementation for each]
-```
-
-Creating Custom Buttons
-
-```
-User: "I need an animated button"
-
-Claude: Found 3 great options:
-1. Shimmer Button - Smooth shimmer effect
-2. Magnetic Button - Follows cursor
-3. Glow Button - Pulsing animation
-
-Which style fits your design?
-```
-
-Dashboard Components
-
-```
-User: "Build an analytics dashboard"
-
-Claude: Setting you up with:
-- Responsive navbar
-- Stat cards with animations  
-- Interactive charts
-- Data tables
-- Notification system
-
-[provides complete code]
-```
-
-### Component Categories
-
-Top 20 Categories:
-
-| Category       | Count | Category       | Count |
-|----------------|-------|----------------|-------|
-| card           | 226   | hero           | 220   |
-| input          | 214   | button         | 211   |
-| form           | 184   | calendar       | 177   |
-| accordion      | 155   | text           | 152   |
-| avatar         | 149   | shader         | 142   |
-| badge          | 138   | image          | 135   |
-| background     | 132   | menu           | 131   |
-| features       | 119   | checkbox       | 118   |
-| modal-dialog   | 97    | dropdown       | 91    |
-| alert          | 87    | carousel       | 86    |
-
-View complete list in CATEGORIES.md
-
-### Technical Stack
-
-- React 18+ - Modern hooks and patterns
-- TypeScript - Full type safety
-- Tailwind CSS - Utility-first styling
-- Framer Motion - Smooth animations
-- Lucide React - Icon system
-- shadcn/ui - Component foundation
-
-### Documentation
-
-- Full Category List (CATEGORIES.md) - All 47 categories detailed
-- Contributing Guide (CONTRIBUTING.md) - How to contribute
-- Example: Landing Page (examples/landing-page.md) - Complete tutorial
-
-### Configuration
-
-Change Component Library Path:
-
-Edit SKILL.md line 96:
-
-```markdown
-All components are stored at: /your/custom/path/
-```
-
-Customize Triggering:
-
-Edit the description field in SKILL.md frontmatter to adjust when the skill activates.
-
-### Contributing
-
-Contributions welcome! See CONTRIBUTING.md for guidelines.
-
-### License
-
-MIT License - see LICENSE for details.
-
-### Links
-
-- Repository: github.com/3135804887-ops/UI-Forge-Skill
-- Issues: Report bugs at github.com/3135804887-ops/UI-Forge-Skill/issues
-- Discussions: Join community at github.com/3135804887-ops/UI-Forge-Skill/discussions
-
----
-
-## 中文文档
-
-### 概述
-
-UI Forge 是一个综合性组件库技能，帮助开发者更快速地构建美观、现代的用户界面。在构建前端应用时，你的 AI 助手会自动建议并集成最适合你需求的组件。
-
-兼容 Claude Code、Cursor、Windsurf 等支持技能/提示词系统的 AI 编码助手。
-
-### 特性
-
-海量组件库
-- 4360+ 生产级组件
-- 47 个分类
-- 154MB 高质量代码
-
-智能集成
-- AI 驱动的组件发现
-- 上下文感知推荐
-- 完整代码和依赖说明
-- 定制化指导
-
-生产就绪
-- 现代 React 模式
-- TypeScript 支持
-- Tailwind CSS 样式
-- 响应式设计
-- 内置无障碍支持
-
-### 安装
-
-方式一：克隆仓库
+## Development
 
 ```bash
-git clone git@github.com:3135804887-ops/UI-Forge-Skill.git
-cd UI-Forge-Skill
-
-# macOS/Linux
-cp -r . ~/.claude/skills/ui-forge
-
-# Windows (Claude Code)
-xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
-
-# For Cursor/Windsurf - adapt path to your AI assistant's skill directory
+npm test
 ```
 
-方式二：下载发行版
+The runtime and tests use only Node built-in modules. Format and reconstruction details are documented progressively in [references/catalog-format.md](references/catalog-format.md) and [references/integration-workflow.md](references/integration-workflow.md). The category mapping has a single canonical copy in [references/categories.md](references/categories.md).
 
-1. 从 Releases 下载最新的 .skill 包
-2. 通过 Claude Code 安装：/skills install ui-forge.skill
+## 中文摘要
 
-### 组件库设置
-
-重要：技能需要组件文件存在于你的系统中。
-
-从 Releases 下载组件库并解压到本地目录。
-
-在 SKILL.md 中更新组件库路径（约第 96 行）：
-
-```markdown
-## Component Library Location
-
-All components are stored at: /path/to/ui-forge-components/
-```
-
-示例路径：
-
-```bash
-# Windows
-C:\UIForge\components\
-
-# macOS/Linux  
-~/ui-forge/components/
-```
-
-验证安装：
-
-```bash
-# 检查组件目录是否存在并包含 47 个分类文件夹
-ls /path/to/ui-forge-components/
-```
-
-你应该能看到 47 个分类目录（button、card、hero 等）
-
-### 使用示例
-
-构建落地页
-
-```
-用户："我需要为我的 SaaS 产品构建一个落地页"
-
-Claude：我会使用 UI Forge 组件来帮你构建！
-让我推荐：
-- 带渐变背景的主视觉区
-- 功能展示卡片
-- 价格对比表
-- 用户评价轮播
-- 行动号召区域
-
-[提供每个部分的完整实现]
-```
-
-创建自定义按钮
-
-```
-用户："我需要一个动画按钮"
-
-Claude：找到3个很棒的选项：
-1. 闪光按钮 - 流畅的闪光效果
-2. 磁性按钮 - 跟随光标
-3. 发光按钮 - 脉冲动画
-
-哪种风格适合你的设计？
-```
-
-仪表板组件
-
-```
-用户："构建一个分析仪表板"
-
-Claude：为你设置：
-- 响应式导航栏
-- 带动画的统计卡片
-- 交互式图表
-- 数据表格
-- 通知系统
-
-[提供完整代码]
-```
-
-### 组件分类
-
-前 20 个分类：
-
-| 分类           | 数量  | 分类           | 数量  |
-|----------------|-------|----------------|-------|
-| 卡片           | 226   | 主视觉         | 220   |
-| 输入框         | 214   | 按钮           | 211   |
-| 表单           | 184   | 日历           | 177   |
-| 手风琴         | 155   | 文本           | 152   |
-| 头像           | 149   | 着色器         | 142   |
-| 徽章           | 138   | 图片           | 135   |
-| 背景           | 132   | 菜单           | 131   |
-| 特性           | 119   | 复选框         | 118   |
-| 模态框         | 97    | 下拉菜单       | 91    |
-| 提示           | 87    | 轮播图         | 86    |
-
-查看 CATEGORIES.md 了解完整列表
-
-### 技术栈
-
-- React 18+ - 现代 hooks 和模式
-- TypeScript - 完整类型安全
-- Tailwind CSS - 实用优先样式
-- Framer Motion - 流畅动画
-- Lucide React - 图标系统
-- shadcn/ui - 组件基础
-
-### 文档
-
-- 完整分类列表 (CATEGORIES.md) - 全部 47 个分类详情
-- 贡献指南 (CONTRIBUTING.md) - 如何贡献
-- 示例：落地页 (examples/landing-page.md) - 完整教程
-
-### 配置
-
-更改组件库路径：
-
-编辑 SKILL.md 第 96 行：
-
-```markdown
-All components are stored at: /your/custom/path/
-```
-
-自定义触发：
-
-编辑 SKILL.md 文件头部的 description 字段来调整技能激活条件。
-
-### 贡献
-
-欢迎贡献！请查看 CONTRIBUTING.md 了解指南。
-
-### 许可证
-
-MIT 许可证 - 详见 LICENSE
-
-### 链接
-
-- 仓库：github.com/3135804887-ops/UI-Forge-Skill
-- 问题：在 github.com/3135804887-ops/UI-Forge-Skill/issues 报告 Bug
-- 讨论：在 github.com/3135804887-ops/UI-Forge-Skill/discussions 加入社区
-
----
-
-<div align="center">
-
-Made for the Claude Code community
-
-If this skill helps you build faster, give us a star on GitHub
-
-</div>
+UI Forge 是平台中立的 React 现成组件发现与复原技能。技能代码和本地组件数据包相互独立；Codex 与 Claude Code 只提供薄适配层，共享同一套 Node 18+ CLI、数据规范和复原原则。请先安装完整技能目录，再解压本地 catalog，通过 `--catalog`、环境变量或配置文件发现它。`show` 会返回所有原始代码块；任何补全代码都必须明确标记为生成内容。
