@@ -10,6 +10,7 @@ Thumbs.db
 # Editor files
 .vscode/
 .idea/
+.codegraph/
 *.sublime-project
 *.sublime-workspace
 
