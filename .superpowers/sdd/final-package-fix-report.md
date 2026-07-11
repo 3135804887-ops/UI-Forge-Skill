@@ -28,3 +28,10 @@ This change fixes the final packager, deterministic ZIP, catalog-integrity, load
 - Real catalog validation: schema 1, 3,455 components, no errors or warnings.
 - Formal package: 3,459 entries, 44,221,247 bytes, SHA-256 `da9110312036932c6e861cc1741710775280a76093a54a16894c15f238efaa91`.
 - The formal ZIP is byte-identical to the pre-hardening artifact because the closed-world allowlist exactly matches the established manifest/components/reports set.
+
+## Case-variant collision follow-up
+
+- Added one path-identity helper for canonical/prospective package paths. Windows comparisons fold filename case; POSIX comparisons preserve case, while existing physical aliases remain resolved by `realpath` on every platform.
+- ZIP/checksum identity collisions and source/output identity collisions now fail structurally with `PACKAGE_PATH_COLLISION` before temporary names or promotion state are created.
+- Added regression coverage for non-existing `catalog.zip` / `CATALOG.ZIP` targets on Windows plus explicit Win32/POSIX helper semantics.
+- Follow-up verification: focused package/security tests 30/30, full suite 122/122, and the rebuilt formal ZIP remains 3,459 entries, 44,221,247 bytes, SHA-256 `da9110312036932c6e861cc1741710775280a76093a54a16894c15f238efaa91`.

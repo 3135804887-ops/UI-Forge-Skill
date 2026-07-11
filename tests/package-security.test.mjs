@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdir, readFile, rename, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { packageCatalog } from "../lib/deterministic-zip.mjs";
+import { packageCatalog, pathsReferToSameLocation } from "../lib/deterministic-zip.mjs";
 import { runPackageCli } from "../scripts/package-catalog.mjs";
 import { createFixtureCatalog, makeTempDir } from "./helpers.mjs";
 
@@ -30,6 +30,24 @@ async function fixture(t) {
   const catalog = await createFixtureCatalog(path.join(root, "catalog"), [record]);
   return { root, catalog, output: path.join(root, "catalog.zip") };
 }
+
+test("compares prospective physical path identity with platform case semantics", () => {
+  const lower = path.resolve("catalog.zip");
+  const upper = path.resolve("CATALOG.ZIP");
+  assert.equal(pathsReferToSameLocation(lower, upper, "win32"), true);
+  assert.equal(pathsReferToSameLocation(lower, upper, "linux"), false);
+  assert.equal(pathsReferToSameLocation(lower, lower, "linux"), true);
+});
+
+test("rejects non-existing ZIP and checksum names that collide by Windows case", { skip: process.platform !== "win32" }, async (t) => {
+  const { root, catalog } = await fixture(t);
+  const output = path.join(root, "catalog.zip");
+  const checksum = path.join(root, "CATALOG.ZIP");
+  await assert.rejects(
+    packageCatalog({ sourcePath: catalog, outputPath: output, checksumPath: checksum }),
+    { code: "PACKAGE_PATH_COLLISION" },
+  );
+});
 
 test("packages only manifest files and the fixed optional reports", async (t) => {
   const { catalog, output } = await fixture(t);

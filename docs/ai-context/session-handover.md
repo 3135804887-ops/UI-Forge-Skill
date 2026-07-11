@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: package path identity hardening rejects non-existing Windows ZIP/checksum names that differ only by case before temporary-file creation; Win32 and POSIX comparison semantics are explicit, focused tests pass 30/30, the full suite passes 122/122, and the formal ZIP hash remains unchanged.
 - Completed: final-review Important 1 now passes at `1ebffa9`. After preserving a failed full round (`en-vue-migration`) and an interrupted calibration (`en-category-options`) as RED evidence, two minimal frontmatter/static-test fixes were made. A fully restarted set of 19 new `fork_turns:none` evaluators matched 19/19 verdicts and 13/13 baseline labels; all three broad negatives were stable 3/3 `no-trigger`.
 - Historical RED checkpoint: the first final-review rerun scored 18/19 individual verdicts and 12/13 labels because `en-vue-migration` falsely triggered. It is preserved in the raw evidence but superseded as current status by the complete 19/19 rerun at `1ebffa9`.
 - Completed: closed-world catalog packaging now derives its allowlist from the validated manifest plus the three fixed reports; rejects extra/missing/non-regular/linked entries and non-canonical paths; canonicalizes package paths physically; preserves CLI recovery state; and keeps the formal ZIP hash unchanged.
@@ -34,6 +35,7 @@
 
 ## Recent decisions
 
+- Compare canonical/prospective package paths with host filename-case semantics: fold case on Windows, preserve case on POSIX, and rely on prior `realpath` resolution for detectable existing aliases. Return `PACKAGE_PATH_COLLISION` for ZIP/checksum or source/output identity collisions.
 - Treat the initial 19-run mismatch and the three-run interrupted calibration as preserved RED evidence, not current results. The current strict result is the complete restarted 19/19 run at `1ebffa9`; known UI Forge categories may trigger without an explicit React token, but arbitrary framework-unspecified options still do not.
 - Keep the prior review-expanded 18/18 distinct-prompt evaluation as historical coverage, but do not conflate it with the final strict baseline reproduction. Preserve the fresh `en-vue-migration` false positive unchanged as the RED finding resolved by `b0a9900`, not as an open current mismatch.
 - Treat the package as a closed world: require `manifest.json` and every exact `components/<manifest path>` entry; allow only optional `reports/build-report.json`, `reports/duplicate-groups.json`, and `reports/rejected-records.json`; reject everything else.

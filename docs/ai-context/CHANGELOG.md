@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added Windows case-variant package-path regressions and explicit Win32/POSIX physical-identity comparison semantics.
+~ Reject ZIP/checksum and source/output identity collisions with structured `PACKAGE_PATH_COLLISION` errors before temporary files or transaction state are created.
+# The path-identity fix preserves the formal 3,459-entry ZIP at 44,221,247 bytes and SHA-256 `da9110312036932c6e861cc1741710775280a76093a54a16894c15f238efaa91`.
 + Completed a new uninterrupted 19-agent trigger rerun at `1ebffa9`: 19/19 individual verdicts and 13/13 original baseline labels matched, including 3/3 `no-trigger` for each broad negative.
 ~ Explicitly exclude all framework migrations even when React is the target, and narrowly recognize existing options in known UI Forge catalog categories such as shader background.
 + Added static RED/GREEN contracts for both final-review trigger ambiguities; preserved the failed first round and interrupted three-run calibration alongside the final raw evidence.
