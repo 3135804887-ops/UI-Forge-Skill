@@ -2,7 +2,7 @@
 
 ## Task status
 
-- Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests.
+- Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
 - In progress (next): implement deterministic catalog loading and platform-neutral discovery on top of the stable schema interfaces.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
 - In progress (next): rewrite the skill trigger description against the immutable baseline, then rerun the same prompt matrix as forward tests.
@@ -15,7 +15,7 @@
 
 ## Recent decisions
 
-- Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison.
+- Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
 - Freeze `tests/skill-trigger-cases.json` as the prompt matrix reused after the trigger rewrite; do not tune cases to the current classifications.
 - Treat the current repository as a prompt-driven component catalog adapter, not yet as a self-contained executable skill.
 - Preserve the component archive outside Git; inspect release assets from a temporary directory instead of committing or extracting them into the repository.

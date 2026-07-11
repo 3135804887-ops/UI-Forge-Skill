@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added committed regression coverage for source identity, statuses, confidence bounds, arrays, code blocks, diagnostics, manifests, and all test helpers.
+~ Expanded metadata URI detection beyond HTTP(S) schemes and narrowed the functional-URL exemption to direct `code_blocks[].code` strings.
+# Nested metadata, including `code_blocks[].extra.code`, must not inherit the canonical code exemption.
 + Added the Node 18+ zero-dependency test harness, deterministic fixture-catalog helpers, and schema version 1 runtime validation.
 ~ Established stable public schema exports: `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl`.
 # Runtime metadata rejects URLs outside canonical code block source; deterministic ordering avoids locale-dependent comparisons.
