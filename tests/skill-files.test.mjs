@@ -68,3 +68,27 @@ test("skill documentation has no personal path or unsupported quality claims", a
     assert.doesNotMatch(text, /F:\\|production-ready|tested components|accessibility built-in/i, path);
   }
 });
+
+test("landing-page example is a reproducible catalog reconstruction walkthrough", async () => {
+  const example = await read("examples/landing-page.md");
+  assert.match(example, /explicitly use UI Forge.*ready-made React/i);
+  assert.match(example, /ui-forge\.mjs validate/);
+  assert.match(example, /default search.*incomplete/i);
+  assert.match(example, /--include-incomplete/);
+  assert.match(example, /button\/motion-button--64c491c2/);
+  assert.match(example, /status.*incomplete.*confidence.*0\.5/is);
+  assert.match(example, /UNRESOLVED_LOCAL_IMPORT/);
+  assert.match(example, /222ba53d131653ad042862610f0ca860622f312e020d943520269b0aa281e1ae/);
+  assert.match(example, /Catalog original/);
+  assert.match(example, /Generated reconstruction/);
+  assert.match(example, /offline structural verifier/i);
+  assert.match(example, /not.*(?:JSX compiler|React runtime|TypeScript compiler|bundler)/is);
+  assert.doesNotMatch(example, /production-ready|fully responsive|accessibility built-in|high-converting/i);
+});
+
+test("forward evidence labels structural checks without overstating compilation", async () => {
+  const evidence = await read("docs/ai-context/evals/forward-tests.md");
+  assert.match(evidence, /offline structural verifier/i);
+  assert.match(evidence, /not.*(?:JSX compiler|React runtime|TypeScript compiler|bundler)/is);
+  assert.match(evidence, /worktree path.*branch evaluation/i);
+});

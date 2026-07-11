@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
++ Hardened the real-world subprocess regression with four distinguishable catalogs proving CLI/environment/nearest-project precedence, default incomplete filtering, exact ordered code-block bytes, functional-resource hashes, and generated/original filesystem isolation.
+~ Replaced the handcrafted landing-page claims with a reproducible full-catalog `validate → search → show` example for `button/motion-button--64c491c2`, including incomplete status, code hash, diagnostics, and reconstruction boundaries.
+~ Relabeled the external fixture's `build`/`typecheck` scripts as an offline structural verifier and explicitly excluded JSX, React runtime, TypeScript, bundler, and browser evidence.
+# Review hardening adds evidence contracts only; runtime CLI/schema behavior is unchanged.
 + Added a realistic zero-dependency end-to-end regression covering legacy conversion, deterministic repeated builds, CLI/environment/project discovery, `validate/search/show`, complete reconstruction input, URL policy, and byte-identical packages.
 + Added the shared `npm run check` validation entry and Windows/macOS/Linux CI coverage for Node 18, 20, and 22.
 + Recorded independent full-catalog forward evidence for honest incomplete-component selection and an external generated-vs-original reconstruction fixture whose offline build passes.

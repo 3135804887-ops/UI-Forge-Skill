@@ -1,316 +1,67 @@
-# Example: Building a Landing Page with UI Forge
+# Example: Reusing a UI Forge Button in a SaaS Landing Page
 
-This example shows how to build a complete landing page using components from UI Forge.
+This example is deliberately narrow: it finds one existing React button for a hero and records what still has to be reconstructed. It does not claim that the catalog entry is tested or ready for a target project.
 
-## User Request
+## Prompt
 
-"I need to build a modern landing page for my SaaS product that converts visitors into customers."
+> Explicitly use UI Forge to find and reuse a ready-made React animated button for a SaaS landing-page hero. Preserve catalog original code, label any generated reconstruction, and report missing files before integration.
 
-## Claude Response (with UI Forge)
+Set `<CATALOG>` to a cleaned local catalog produced by `build-catalog.mjs` or extracted from a future cleaned release asset.
 
-I'll help you build a high-converting landing page using components from UI Forge! Let me set up a complete landing page with:
-
-### 1. Hero Section with Gradient Background
-
-First, let's add a stunning hero section:
-
-```tsx
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-
-export default function Hero() {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 opacity-20" />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-          Build Faster with AI
-        </h1>
-        
-        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          The modern SaaS platform that helps teams ship products 10x faster
-        </p>
-        
-        <div className="flex gap-4 justify-center">
-          <Button size="lg" className="group">
-            Start Free Trial
-            <ArrowRight className="ml-2 group-hover:translate-x-1 transition" />
-          </Button>
-          <Button size="lg" variant="outline">
-            Watch Demo
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-}
-```
-
-### 2. Features Section with Icon Cards
-
-```tsx
-import { Zap, Shield, Sparkles } from "lucide-react";
-
-const features = [
-  {
-    icon: Zap,
-    title: "Lightning Fast",
-    description: "Built for speed with cutting-edge technology"
-  },
-  {
-    icon: Shield,
-    title: "Secure by Default",
-    description: "Enterprise-grade security out of the box"
-  },
-  {
-    icon: Sparkles,
-    title: "AI-Powered",
-    description: "Smart automation that learns from your workflow"
-  }
-];
-
-export default function Features() {
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Everything you need to succeed
-        </h2>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {features.map((feature) => (
-            <div key={feature.title} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-              <feature.icon className="w-12 h-12 text-purple-600 mb-4" />
-              <h3 className="text-2xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-```
-
-### 3. Pricing Section
-
-```tsx
-import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const plans = [
-  {
-    name: "Starter",
-    price: "$29",
-    features: ["Up to 5 users", "Basic features", "Email support"]
-  },
-  {
-    name: "Pro",
-    price: "$99",
-    popular: true,
-    features: ["Up to 20 users", "Advanced features", "Priority support", "Custom integrations"]
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    features: ["Unlimited users", "All features", "24/7 support", "Dedicated account manager"]
-  }
-];
-
-export default function Pricing() {
-  return (
-    <section className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Simple, transparent pricing
-        </h2>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {plans.map((plan) => (
-            <div 
-              key={plan.name}
-              className={`p-8 rounded-2xl border-2 ${
-                plan.popular 
-                  ? 'border-purple-600 shadow-2xl scale-105' 
-                  : 'border-gray-200'
-              }`}
-            >
-              {plan.popular && (
-                <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  Most Popular
-                </span>
-              )}
-              
-              <h3 className="text-2xl font-bold mt-4">{plan.name}</h3>
-              <div className="mt-4 mb-6">
-                <span className="text-5xl font-bold">{plan.price}</span>
-                {plan.price !== "Custom" && <span className="text-gray-600">/month</span>}
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-green-600" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Button 
-                className="w-full" 
-                variant={plan.popular ? "default" : "outline"}
-              >
-                Get Started
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-```
-
-### 4. Testimonials Carousel
-
-```tsx
-"use client";
-
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const testimonials = [
-  {
-    quote: "This product transformed how our team works. We're 10x more productive!",
-    author: "Sarah Johnson",
-    role: "CEO at TechCorp"
-  },
-  {
-    quote: "The best investment we've made this year. Highly recommended!",
-    author: "Mike Chen",
-    role: "CTO at StartupXYZ"
-  }
-];
-
-export default function Testimonials() {
-  const [current, setCurrent] = useState(0);
-  
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Loved by thousands
-        </h2>
-        
-        <div className="relative bg-white p-12 rounded-2xl shadow-xl">
-          <p className="text-2xl text-gray-700 mb-6">
-            "{testimonials[current].quote}"
-          </p>
-          <div>
-            <p className="font-semibold">{testimonials[current].author}</p>
-            <p className="text-gray-600">{testimonials[current].role}</p>
-          </div>
-          
-          <div className="flex gap-2 mt-6">
-            <button 
-              onClick={() => setCurrent((current - 1 + testimonials.length) % testimonials.length)}
-              className="p-2 rounded-full hover:bg-gray-100"
-            >
-              <ChevronLeft />
-            </button>
-            <button 
-              onClick={() => setCurrent((current + 1) % testimonials.length)}
-              className="p-2 rounded-full hover:bg-gray-100"
-            >
-              <ChevronRight />
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-```
-
-### 5. Call-to-Action Section
-
-```tsx
-import { Button } from "@/components/ui/button";
-
-export default function CTA() {
-  return (
-    <section className="py-20 bg-gradient-to-r from-purple-600 to-pink-600">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Ready to get started?
-        </h2>
-        <p className="text-xl mb-8 opacity-90">
-          Join thousands of teams already using our platform
-        </p>
-        <Button size="lg" variant="secondary">
-          Start Your Free Trial
-        </Button>
-      </div>
-    </section>
-  );
-}
-```
-
-### Complete Page Structure
-
-```tsx
-import Hero from "@/components/Hero";
-import Features from "@/components/Features";
-import Pricing from "@/components/Pricing";
-import Testimonials from "@/components/Testimonials";
-import CTA from "@/components/CTA";
-
-export default function LandingPage() {
-  return (
-    <main>
-      <Hero />
-      <Features />
-      <Pricing />
-      <Testimonials />
-      <CTA />
-    </main>
-  );
-}
-```
-
-## Dependencies
+## 1. Validate
 
 ```bash
-npm install lucide-react
+node scripts/ui-forge.mjs validate --catalog "<CATALOG>" --json
 ```
 
-All components use Tailwind CSS. Make sure your `tailwind.config.js` includes:
+Verified local evidence: schema 1, 3,455 records, no validation errors or warnings.
 
-```js
-module.exports = {
-  content: [
-    './app/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-  ],
-  theme: {
-    extend: {},
-  },
-}
+## 2. Search with the default status filter
+
+```bash
+node scripts/ui-forge.mjs search "animated SaaS hero button" --category button --limit 3 --catalog "<CATALOG>" --json
 ```
 
-## Result
+The verified catalog returns no default result. This is expected: matching button records are `incomplete`, and default search excludes incomplete entries. Do not invent a complete match.
 
-A complete, modern landing page with:
-- ✅ Eye-catching hero section
-- ✅ Feature showcase
-- ✅ Pricing comparison
-- ✅ Social proof (testimonials)
-- ✅ Strong call-to-action
-- ✅ Fully responsive
-- ✅ Production-ready code
+Retry only after accepting reconstruction work:
 
-This entire page was built in minutes using UI Forge components!
+```bash
+node scripts/ui-forge.mjs search "animated SaaS hero button" --category button --limit 5 --include-incomplete --catalog "<CATALOG>" --json
+```
+
+One observed candidate is `button/motion-button--64c491c2` (`Motion Button`).
+
+## 3. Retrieve the exact inventory
+
+```bash
+node scripts/ui-forge.mjs show "button/motion-button--64c491c2" --catalog "<CATALOG>" --json
+```
+
+Observed inventory:
+
+- status: `incomplete`; confidence: `0.5`
+- dependencies: none declared
+- unresolved local import: `../components/ui/motion-button`
+- diagnostic: `UNRESOLVED_LOCAL_IMPORT`
+- code blocks: one JSX `usage` block; no implementation block
+- suggested path: unavailable
+- original code SHA-256: `222ba53d131653ad042862610f0ca860622f312e020d943520269b0aa281e1ae`
+
+The hash summarizes the observed block without duplicating its source here. The missing implementation means this is not an exact restoration.
+
+## 4. Separate source from inference
+
+### Catalog original
+
+Save the single returned `code_blocks[0].code` byte-for-byte in an original-only directory. Keep its role, language, index, hash, unresolved import, and diagnostic in an inventory. Do not add a trailing newline or rewrite imports silently.
+
+### Generated reconstruction
+
+If the project does not already contain `motion-button`, create the missing implementation only in a separate generated area and label every inferred file and assumption as `Generated reconstruction`. Inspect the target project's React version, aliases, styling, package manager, and existing dependencies before choosing its API or adding packages.
+
+After integration, run the target project's real typecheck, tests, lint, and build. Those project commands—not this catalog example—determine whether the reconstruction works.
+
+## Evidence boundary
+
+The forward evaluation also used an offline structural verifier to compare original bytes, check generated/original directory separation, and inspect a dependency-free element data shape. That verifier is not a JSX compiler, React runtime, TypeScript compiler, or bundler. Its scripts happened to be named `build` and `typecheck`, but those names do not provide compilation or runtime evidence.

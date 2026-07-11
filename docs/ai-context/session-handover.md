@@ -2,9 +2,10 @@
 
 ## Task status
 
-- Completed: Task 10 added an automated legacy-to-build-to-validate/search/show-to-package scenario, a cross-platform `npm run check` entry, and Windows/macOS/Linux CI on Node 18/20/22; the full suite passes 91/91.
+- Completed: Task 10 added and review-hardened an automated legacy-to-build-to-validate/search/show-to-package scenario. Four distinct subprocess catalogs prove discovery precedence; exact code bytes/order/newline behavior, incomplete filtering, asset hashing, and generated/original isolation are asserted. Cross-platform `npm run check` and Windows/macOS/Linux CI cover Node 18/20/22; the full suite passes 93/93.
 - Completed: two independent forward scenarios used the full cleaned catalog. The read-only selector chose `button/motion-button--64c491c2` only after explicitly including incomplete records and reported its missing implementation honestly; the reconstruction scenario preserved `button/animated-button--02ab4c4a` original code outside Git, labeled every generated file, and passed its offline fixture build.
 - Completed: reconciled contributor and release notes with the platform-neutral core, real CLI/build/package flow, TDD fixture policy, URL-free runtime metadata, current legacy asset, and future cleaned release without claiming publication.
+- Completed: replaced the stale handcrafted landing-page example with the real `button/motion-button--64c491c2` discovery/inventory flow and corrected forward evidence so offline structural checks are not described as JSX/React/TypeScript/bundler validation.
 - Completed: final local verification passed `quick_validate`, `npm run check`, full catalog validation (schema 1, 3,455 components, no errors/warnings), `git diff --check`, hard-coded-path/URL scans, and tracked-large/generated-artifact checks.
 - Completed: validated the entire v1.0 archive after adding real-data string-code-block compatibility; final accounting is 4,360 input = 3,455 emitted + 905 merged + 0 rejected, with 99 complete and 3,356 incomplete records, all 25,885 usable code blocks represented, and no runtime metadata URLs or duplicate text storage.
 - Completed: repeated the full build into an independent directory with identical manifest digest, relative paths, per-file SHA-256 values, and report bytes; added a cross-platform deterministic ZIP packager whose independent outputs are byte-identical and whose extracted catalog validates successfully.
@@ -32,6 +33,7 @@
 - Use `npm run check` as the platform-neutral repository validation entry and run it in CI on Windows, macOS, and Linux starting at Node 18; keep it shell-neutral as `node --test`.
 - Treat empty default search for animated buttons as truthful status filtering, not a search failure. Assistants may retry with `--include-incomplete`, but must preserve diagnostics and label missing implementation code as generated reconstruction.
 - Keep realistic reconstruction fixtures outside Git. Preserve catalog blocks unchanged in an original inventory and place inferred files plus assumptions in a visibly separate generated directory.
+- Treat script names such as `build` and `typecheck` as labels, not evidence: the external fixture ran only a zero-dependency offline structural verifier, so project compilation/runtime claims still require real target-project tools.
 - Accept both legacy string code blocks and `{ code }` objects; v1.0 normal records use strings, while recovery and fixtures use structured blocks. Preserve code text while normalizing line endings deterministically.
 - Treat `89ea5545695e22b57b57b75ddd403aabad9245119d0ebab0a3dce0d80da89f25` as the only valid full-catalog digest. The earlier `626ba7d...` exploratory output discarded v1.0 string blocks and is invalidated.
 - Package catalogs with the Node deterministic ZIP writer, ordinal paths, fixed timestamps/permissions, and no wrapper directory; do not use platform archive utilities for release-byte reproducibility.
@@ -108,6 +110,7 @@
 - `.github/workflows/validate.yml` and `package.json` — cross-platform Node 18+ automated validation entry.
 - `tests/real-world-scenarios.test.mjs` — lightweight end-to-end legacy build, discovery, CLI reconstruction, URL policy, and deterministic package regression.
 - `docs/ai-context/evals/forward-tests.md` — independent full-catalog selection and incomplete reconstruction evidence.
+- `examples/landing-page.md` — concise reproducible Motion Button lookup and honest generated-reconstruction boundary.
 - `CONTRIBUTING.md` and `RELEASE_NOTES.md` — current contribution, runtime-data, and not-yet-published release contract.
 - `lib/deterministic-zip.mjs` and `scripts/package-catalog.mjs` — zero-dependency cross-platform deterministic ZIP output and checksum CLI.
 - `tests/catalog-package.test.mjs` — archive-byte determinism regression independent of source mtimes.
@@ -130,9 +133,6 @@
 - `tests/helpers.mjs` — deterministic temporary catalog and child-process test helpers.
 - `README.md` — current legacy-to-cleaned installation, configuration, and CLI documentation.
 - `CATEGORIES.md` — compatibility pointer to the canonical `references/categories.md` table.
-- `examples/landing-page.md` — legacy handcrafted example pending Task 10 reconciliation.
-- `CONTRIBUTING.md` — contribution guidance with placeholder repository links.
-- `RELEASE_NOTES.md` — v1.0.0 release claims.
 
 ## Open questions
 
