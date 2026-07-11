@@ -2,6 +2,8 @@
 
 ## Task status
 
+- Completed: validated the entire v1.0 archive after adding real-data string-code-block compatibility; final accounting is 4,360 input = 3,455 emitted + 905 merged + 0 rejected, with 99 complete and 3,356 incomplete records, all 25,885 usable code blocks represented, and no runtime metadata URLs or duplicate text storage.
+- Completed: repeated the full build into an independent directory with identical manifest digest, relative paths, per-file SHA-256 values, and report bytes; added a cross-platform deterministic ZIP packager whose independent outputs are byte-identical and whose extracted catalog validates successfully.
 - Completed: rewrote `SKILL.md` as a narrow platform-neutral entry, moved detailed guidance into progressive references, added Codex/Claude Code thin adapters and Codex metadata, reconciled public installation/CLI docs, and added static skill regressions; static, quick validation, and full tests pass, and a fresh-context evaluator matched all 18 original-plus-adversarial trigger labels.
 - Completed: implemented and review-hardened zero-dependency legacy-record loading, malformed JSON/code-block recovery, normalized-URL deduplication, complete source-to-emitted report mappings, deterministic merge-base selection, project-alias-aware static analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
 - Completed: added and review-hardened deterministic catalog filesystem output, shared-rule manifest generation, auditable reports, realpath-aware source/output containment, validation-gated atomic promotion, non-fatal post-promotion cleanup warnings, and an absolute-path build CLI; focused and full tests pass.
@@ -12,7 +14,7 @@
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
 - Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; at that historical baseline all 7 negative cases over-triggered, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
-- Next: execute Task 9 against the full legacy archive, generate the cleaned catalog outside Git, validate record accounting and known repairs, repeat the build for determinism, and package local evidence without publishing a release.
+- Next: execute Task 10 realistic forward scenarios, reconcile contributor/release documentation, run final verification, and prepare the branch for review without publishing a release.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
@@ -22,6 +24,9 @@
 
 ## Recent decisions
 
+- Accept both legacy string code blocks and `{ code }` objects; v1.0 normal records use strings, while recovery and fixtures use structured blocks. Preserve code text while normalizing line endings deterministically.
+- Treat `89ea5545695e22b57b57b75ddd403aabad9245119d0ebab0a3dce0d80da89f25` as the only valid full-catalog digest. The earlier `626ba7d...` exploratory output discarded v1.0 string blocks and is invalidated.
+- Package catalogs with the Node deterministic ZIP writer, ordinal paths, fixed timestamps/permissions, and no wrapper directory; do not use platform archive utilities for release-byte reproducibility.
 - Keep `SKILL.md` below 650 words with only the trigger boundary, validate/search/show integration workflow, reconstruction preservation rule, direct reference routing, and common failure handling.
 - Require frontmatter—not only body instructions—to exclude Vue, SwiftUI, native HTML, and other non-React category-option requests; explicit UI Forge requests remain an unconditional activation path.
 - Make `references/categories.md` the only hand-maintained category table; `CATEGORIES.md` is a compatibility pointer rather than a duplicate count source.
@@ -91,6 +96,9 @@
 
 ## Key files
 
+- `lib/deterministic-zip.mjs` and `scripts/package-catalog.mjs` — zero-dependency cross-platform deterministic ZIP output and checksum CLI.
+- `tests/catalog-package.test.mjs` — archive-byte determinism regression independent of source mtimes.
+- `docs/ai-context/evals/full-catalog-build.md` — complete real-data accounting, integrity, CLI, repeat-build, and package evidence.
 - `SKILL.md` — narrow trigger and concise platform-neutral catalog-selection/integration workflow.
 - `references/` — progressively disclosed configuration, format, category, and integration guidance.
 - `adapters/` and `agents/openai.yaml` — thin Codex/Claude Code integration documentation and Codex display policy.

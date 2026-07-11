@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
++ Added a deterministic Node ZIP packager with fixed entry metadata, sorted root-relative paths, checksum output, no wrapper directory, and regression coverage proving source mtimes do not affect archive bytes.
+~ Extended legacy code-block loading to accept the string arrays used by the real v1.0 catalog while retaining structured recovery blocks and exact functional code content.
++ Recorded full-catalog evidence: 4,360 inputs account for 3,455 emitted + 905 merged + 0 rejected, all 25,885 usable source blocks are represented, and independent builds and ZIPs are byte-identical.
+# Shared catalog build/packaging interface: final content digest is `89ea5545695e22b57b57b75ddd403aabad9245119d0ebab0a3dce0d80da89f25`; the exploratory `626ba7d...` output was invalidated because it dropped normal string code blocks.
 ~ Marked initial SKILL/README findings and optimization order as historical baseline, removed stale duplicate key-file descriptions, and tied the expanded trigger evidence to the exact `b7770b9` content.
 + Added adversarial non-React category/option trigger cases for Vue, SwiftUI, native HTML, and Chinese framework-specific requests.
 ~ Tightened the frontmatter itself so category-option activation requires React/local-catalog context while explicit UI Forge requests still activate.
