@@ -115,6 +115,14 @@ test("records invalid candidates and reports CATALOG_NOT_FOUND", async (t) => {
       assert.equal(error.checked[0].source, "cli");
       assert.equal(error.checked[0].reason, "UNSUPPORTED_SCHEMA_VERSION");
       assert.equal(error.checked[1].source, "environment");
+      assert.deepEqual(
+        error.checked.find((candidate) => candidate.source === "user-config"),
+        {
+          source: "user-config",
+          path: userConfigPath(process.platform, {}, path.join(root, "home")),
+          reason: "CATALOG_NOT_FOUND",
+        },
+      );
       return true;
     },
   );

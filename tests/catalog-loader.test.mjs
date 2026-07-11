@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { computeManifestDigest } from "../lib/catalog-integrity.mjs";
 import { loadCatalog, validateCatalog } from "../lib/catalog-loader.mjs";
 import { createFixtureCatalog, makeTempDir, writeJson } from "./helpers.mjs";
 
@@ -63,14 +64,59 @@ test("rejects duplicate component IDs", async (t) => {
   const secondFile = path.join(root, "components", manifest.files[1].path);
   const duplicateContents = `${JSON.stringify({ ...recordA, title: "Duplicate" }, null, 2)}\n`;
   await writeFile(secondFile, duplicateContents, "utf8");
+  manifest.files[1].id = recordA.id;
   manifest.files[1].sha256 = createHash("sha256").update(duplicateContents).digest("hex");
-  const base = { schema_version: manifest.schema_version, component_count: manifest.component_count, files: manifest.files };
-  manifest.digest = createHash("sha256").update(JSON.stringify(base)).digest("hex");
+  manifest.digest = computeManifestDigest(manifest.files);
   await writeJson(manifestFile, manifest);
 
   const result = await validateCatalog(root);
   assert.equal(result.valid, false);
   assert.equal(result.errors[0].code, "DUPLICATE_ID");
+});
+
+test("reports manifest digest mismatches", async (t) => {
+  const root = await withCatalog(t);
+  const manifestFile = path.join(root, "manifest.json");
+  const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
+  await writeJson(manifestFile, { ...manifest, digest: "0".repeat(64) });
+
+  await assert.rejects(loadCatalog(root), { code: "MANIFEST_DIGEST_MISMATCH" });
+  assert.equal((await validateCatalog(root)).errors[0].code, "MANIFEST_DIGEST_MISMATCH");
+});
+
+test("rejects traversal and absolute manifest paths", async (t) => {
+  for (const unsafePath of ["../../outside.json", "/absolute/outside.json", "C:\\absolute\\outside.json"]) {
+    await t.test(unsafePath, async () => {
+      const root = await makeTempDir();
+      t.after(() => rm(root, { recursive: true, force: true }));
+      await createFixtureCatalog(root, [recordA]);
+      const manifestFile = path.join(root, "manifest.json");
+      const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
+      manifest.files[0].path = unsafePath;
+      await writeJson(manifestFile, manifest);
+
+      const result = await validateCatalog(root);
+      assert.equal(result.valid, false);
+      assert.equal(result.errors[0].code, "INVALID_COMPONENT_PATH");
+    });
+  }
+});
+
+test("normalizes separators for a valid nested component path", async (t) => {
+  const root = await withCatalog(t);
+  const manifestFile = path.join(root, "manifest.json");
+  const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
+  const originalFile = path.join(root, "components", manifest.files[0].path);
+  const nestedDirectory = path.join(root, "components", "nested");
+  await mkdir(nestedDirectory, { recursive: true });
+  await rename(originalFile, path.join(nestedDirectory, "alpha.json"));
+  manifest.files[0].path = "nested\\alpha.json";
+  manifest.digest = computeManifestDigest(manifest.files);
+  await writeJson(manifestFile, manifest);
+
+  const loaded = await loadCatalog(root);
+  assert.equal(loaded.manifest.files[0].path, "nested/alpha.json");
+  assert.equal(loaded.records[0].id, recordA.id);
 });
 
 test("reports file digest mismatches without throwing from validateCatalog", async (t) => {

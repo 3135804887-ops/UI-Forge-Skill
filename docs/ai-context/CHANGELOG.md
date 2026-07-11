@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added shared catalog integrity helpers for normalized component paths, containment-safe resolution, and the Task 7 newline/NUL manifest digest contract.
+~ Hardened catalog loading against traversal and absolute Windows/POSIX manifest paths, and made missing user config visible in discovery diagnostics.
+# Shared digest generation prevents fixture, loader, and future builder implementations from drifting apart.
 + Added deterministic catalog loading with manifest and component SHA-256 verification, record validation, duplicate-ID detection, and structured validation results.
 + Added catalog discovery precedence across CLI, environment, nearest project config, platform-specific user config, and common install locations.
 # Discovery checks only readable supported manifests; full catalog integrity validation remains the loader's responsibility.

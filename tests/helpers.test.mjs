@@ -63,8 +63,11 @@ test("createFixtureCatalog writes sorted records and deterministic digests", asy
     const contents = await readFile(path.join(root, "components", entry.path), "utf8");
     assert.equal(entry.sha256, createHash("sha256").update(contents).digest("hex"));
   }
-  const base = { schema_version: 1, component_count: 2, files: manifest.files };
-  assert.equal(manifest.digest, createHash("sha256").update(JSON.stringify(base)).digest("hex"));
+  const digestInput = manifest.files
+    .map((entry) => `${entry.path.replaceAll("\\", "/")}\0${entry.sha256}`)
+    .sort()
+    .join("\n");
+  assert.equal(manifest.digest, createHash("sha256").update(digestInput).digest("hex"));
 });
 
 test("runNode captures successful and failing child processes", async () => {

@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: hardened catalog integrity after review with the Task 7 manifest-digest contract, normalized safe component paths, explicit containment checks, and complete discovery diagnostics.
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
 - In progress (next): build deterministic search and reconstruction behavior on top of the loaded catalog records.
@@ -17,6 +18,8 @@
 
 ## Recent decisions
 
+- Define the manifest digest as SHA-256 over newline-joined `<normalized relative path>\0<file sha256>` rows sorted by normalized path; fixtures, loaders, and the future builder share this contract through `lib/catalog-integrity.mjs`.
+- Reject drive-qualified, POSIX-absolute, backslash-absolute, and any `..` component paths before hashing or file I/O; resolve accepted paths and verify they remain below `<catalog>/components`.
 - Treat catalog discovery as a lightweight manifest check; full component parsing, digest verification, and record validation occur only during catalog loading.
 - Use platform-specific config/data roots plus `~/.ui-forge/catalog` as deterministic common install candidates; relative config values resolve from the owning config file.
 - Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
@@ -57,6 +60,7 @@
 
 ## Key files
 
+- `lib/catalog-integrity.mjs` — shared component-path normalization, containment resolution, and manifest digest contract.
 - `lib/catalog-loader.mjs` — strict deterministic loading plus non-throwing structured catalog validation.
 - `lib/catalog-config.mjs` — cross-platform config paths and ordered local catalog discovery.
 - `lib/catalog-schema.mjs` — schema constants, record/manifest validators, and metadata URL detection.

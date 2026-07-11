@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { computeManifestDigest } from "../lib/catalog-integrity.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -40,7 +41,7 @@ export async function createFixtureCatalog(root, records) {
   };
   const manifest = {
     ...manifestBase,
-    digest: createHash("sha256").update(JSON.stringify(manifestBase)).digest("hex"),
+    digest: computeManifestDigest(files),
   };
   await writeJson(path.join(root, "manifest.json"), manifest);
   return root;
