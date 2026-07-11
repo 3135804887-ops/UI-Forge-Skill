@@ -3,7 +3,7 @@
 ## Task status
 
 - Completed: implemented and review-hardened zero-dependency legacy-record loading, malformed JSON/code-block recovery, normalized-URL deduplication, complete source-to-emitted report mappings, deterministic merge-base selection, project-alias-aware static analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
-- Completed: added and review-hardened deterministic catalog filesystem output, shared-rule manifest generation, auditable reports, realpath-aware source/output containment, validation-gated atomic promotion, explicit cleanup-failure rollback/recovery state, and an absolute-path build CLI; focused and full tests pass.
+- Completed: added and review-hardened deterministic catalog filesystem output, shared-rule manifest generation, auditable reports, realpath-aware source/output containment, validation-gated atomic promotion, non-fatal post-promotion cleanup warnings, and an absolute-path build CLI; focused and full tests pass.
 - In progress (next): rewrite the skill with progressive disclosure and add portable assistant adapters.
 - Completed: added and review-hardened the zero-dependency `validate`, `search`, and `show` CLI with strict nonblank arguments, stable JSON/human output (including structured JSON usage errors), explicit related-category envelopes, shared exact-ID validation, and exit codes `0`/`1`/`2`; focused and full tests pass.
 - Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
@@ -24,10 +24,10 @@
 ## Recent decisions
 
 - Expose `loadLegacyRecords({ sourcePath }) -> { records, report }` as the recovery/normalization boundary consumed by the future deterministic builder; it performs no output writes, manifest generation, or promotion.
-- Expose `buildCatalog({ sourcePath, outputPath }) -> { manifest, report, buildReport, outputPath }`; component JSON is written in sorted ID order, validated in a sibling temporary directory, and only then promoted over an existing output through a sibling backup.
+- Expose `buildCatalog({ sourcePath, outputPath }) -> { manifest, report, buildReport, outputPath, warnings }`; component JSON is written in sorted ID order, validated in a sibling temporary directory, and only then promoted over an existing output through a sibling backup.
 - Treat source/output overlap in either direction as unsafe in the builder; the CLI additionally requires both paths to be absolute and rejects output nested in source before scanning.
 - Canonicalize an existing source with `realpath`; canonicalize a prospective output through its nearest existing ancestor so symlink/junction aliases cannot bypass bidirectional overlap checks.
-- If backup removal fails after promotion, move the new output aside and restore the backup before reporting failure; if any rollback step fails, retain the recoverable paths and attach their exact state to `PROMOTION_ROLLBACK_FAILED`.
+- Once temporary output promotion succeeds, treat it as authoritative: backup cleanup failure returns a deterministic warning, leaves the complete new output active, and preserves any residual backup recovery material without retrying deletion.
 - Keep component file digests over exact formatted bytes and compute the catalog content digest exclusively through the shared manifest newline/NUL contract; reports are deterministic auxiliary files and are not manifest components.
 - Include every accepted source path in `report.emitted_sources`, including singleton records, while retaining duplicate-specific merge details separately and keeping all source paths out of runtime records.
 - Treat `src/`, `components/`, `lib/`, `hooks/`, `utils/`, `styles/`, `assets/`, `app/`, and `pages/` subpaths as configured-looking local imports; other bare/scoped package subpaths remain install dependencies.

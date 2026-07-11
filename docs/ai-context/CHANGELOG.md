@@ -2,7 +2,7 @@
 
 ## 2026-07-11
 
-~ Hardened catalog promotion cleanup failures to roll back the new output, restore the prior catalog, and report explicit recovery paths/state when rollback cannot finish.
+~ Treat post-promotion backup cleanup failures as non-fatal warnings, retaining the complete promoted catalog and any residual backup recovery material without unsafe rollback from a possibly partial backup.
 ~ Canonicalized source and prospective output paths through filesystem realpaths so symlink/junction aliases cannot bypass overlap protection.
 ~ Reject blank, non-string, and non-file-URL builder source paths with stable `INVALID_SOURCE_PATH` errors.
 # Review regressions use an internal second-argument filesystem dependency seam, leaving the documented `buildCatalog({ sourcePath, outputPath })` options contract unchanged.

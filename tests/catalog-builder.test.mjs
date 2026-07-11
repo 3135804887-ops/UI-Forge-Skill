@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, readdir, rename, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ import {
 import { computeManifestDigest } from "../lib/catalog-integrity.mjs";
 import { containsMetadataUrl, validateRecord } from "../lib/catalog-schema.mjs";
 import { runNode } from "./helpers.mjs";
+import { runBuildCli } from "../scripts/build-catalog.mjs";
 
 const fixtureRoot = new URL("./fixtures/source/", import.meta.url);
 const buildCli = fileURLToPath(new URL("../scripts/build-catalog.mjs", import.meta.url));
@@ -296,6 +297,8 @@ test("builds deterministic URL-free output, manifest, and complete reports", asy
   const first = await buildCatalog({ sourcePath: fixtureRoot, outputPath: outputA });
   const second = await buildCatalog({ sourcePath: fixtureRoot, outputPath: outputB });
 
+  assert.deepEqual(first.warnings, []);
+  assert.deepEqual(second.warnings, []);
   assert.equal(first.manifest.digest, second.manifest.digest);
   assert.deepEqual(await hashTree(outputA), await hashTree(outputB));
   assert.equal((await listFiles(outputA)).some((file) => /_code_\d+\.txt$/.test(file)), false);
@@ -387,6 +390,7 @@ test("build CLI validates paths and emits stable JSON and human summaries", asyn
     rejected: 0,
     component_files: 2,
     manifest_digest: JSON.parse(await readFile(join(output, "manifest.json"), "utf8")).digest,
+    warnings: [],
   });
   assert.equal(jsonResult.stdout.endsWith("\n"), true);
 
@@ -409,82 +413,82 @@ test("build CLI validates paths and emits stable JSON and human summaries", asyn
   }
 });
 
-test("rolls back the promoted catalog when backup cleanup fails", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-cleanup-failure-"));
+test("keeps the promoted catalog successful when backup cleanup partially fails", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-partial-cleanup-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const source = fileURLToPath(new URL(".", fixtureRoot));
   const output = join(root, "catalog");
   const backup = `${output}.backup-${process.pid}`;
-  const failedOutput = `${output}.failed-${process.pid}`;
   await mkdir(output);
   await writeFile(join(output, "sentinel.txt"), "old-output\n", "utf8");
 
-  await assert.rejects(
-    buildCatalog(
-      { sourcePath: source, outputPath: output },
+  const result = await buildCatalog(
+    { sourcePath: source, outputPath: output },
+    {
+      promotionOperations: {
+        rm: async (target, options) => {
+          if (target === backup) {
+            await rm(join(target, "sentinel.txt"));
+            throw Object.assign(new Error("injected partial backup removal failure"), { code: "EACCES" });
+          }
+          return rm(target, options);
+        },
+      },
+    },
+  );
+
+  assert.equal(await pathExists(join(output, "manifest.json")), true);
+  assert.equal(await pathExists(join(output, "sentinel.txt")), false);
+  assert.equal(await pathExists(backup), true);
+  assert.equal(await pathExists(join(backup, "sentinel.txt")), false);
+  assert.equal(await pathExists(`${output}.tmp-${process.pid}`), false);
+  assert.deepEqual(result.warnings, [{
+    code: "BACKUP_CLEANUP_FAILED",
+    message: "Catalog promotion succeeded, but backup cleanup was incomplete; residual recovery material may remain.",
+    diagnostic_backup_path: backup,
+  }]);
+});
+
+test("build CLI reports cleanup warnings in JSON and human output while succeeding", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-cli-warning-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const source = fileURLToPath(new URL(".", fixtureRoot));
+
+  for (const json of [true, false]) {
+    const output = join(root, json ? "json-catalog" : "human-catalog");
+    const backup = `${output}.backup-${process.pid}`;
+    await mkdir(output);
+    await writeFile(join(output, "sentinel.txt"), "old-output\n", "utf8");
+    let stdout = "";
+    let stderr = "";
+    const code = await runBuildCli(
+      ["--source", source, "--output", output, ...(json ? ["--json"] : [])],
+      { stdout: { write: (value) => { stdout += value; } }, stderr: { write: (value) => { stderr += value; } } },
       {
         promotionOperations: {
           rm: async (target, options) => {
             if (target === backup) {
-              const error = new Error("injected backup removal failure");
-              error.code = "EACCES";
-              throw error;
+              await rm(join(target, "sentinel.txt"));
+              throw Object.assign(new Error("injected partial backup removal failure"), { code: "EACCES" });
             }
             return rm(target, options);
           },
         },
       },
-    ),
-    (error) => error?.code === "BACKUP_CLEANUP_FAILED"
-      && error?.rollback?.old_output_restored === true
-      && error?.rollback?.new_output_preserved === false,
-  );
-
-  assert.equal(await readFile(join(output, "sentinel.txt"), "utf8"), "old-output\n");
-  assert.equal(await pathExists(backup), false);
-  assert.equal(await pathExists(failedOutput), false);
-  assert.equal(await pathExists(`${output}.tmp-${process.pid}`), false);
-});
-
-test("preserves explicit recovery paths when backup restoration also fails", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "ui-forge-build-rollback-failure-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
-  const source = fileURLToPath(new URL(".", fixtureRoot));
-  const output = join(root, "catalog");
-  const backup = `${output}.backup-${process.pid}`;
-  const failedOutput = `${output}.failed-${process.pid}`;
-  await mkdir(output);
-  await writeFile(join(output, "sentinel.txt"), "old-output\n", "utf8");
-
-  await assert.rejects(
-    buildCatalog(
-      { sourcePath: source, outputPath: output },
-      {
-        promotionOperations: {
-          rm: async (target, options) => {
-            if (target === backup) throw Object.assign(new Error("injected backup removal failure"), { code: "EACCES" });
-            return rm(target, options);
-          },
-          rename: async (from, to) => {
-            if (from === backup && to === output) throw Object.assign(new Error("injected backup restore failure"), { code: "EACCES" });
-            return rename(from, to);
-          },
-        },
-      },
-    ),
-    (error) => error?.code === "PROMOTION_ROLLBACK_FAILED"
-      && error?.rollback?.output_path === output
-      && error?.rollback?.backup_path === backup
-      && error?.rollback?.new_output_path === failedOutput
-      && error?.rollback?.old_output_restored === false
-      && error?.rollback?.new_output_preserved === true
-      && /restore failure/.test(error?.rollback?.restore_error ?? ""),
-  );
-
-  assert.equal(await pathExists(output), false);
-  assert.equal(await pathExists(backup), true);
-  assert.equal(await pathExists(failedOutput), true);
-  assert.equal(await readFile(join(backup, "sentinel.txt"), "utf8"), "old-output\n");
+    );
+    assert.equal(code, 0);
+    assert.equal(stderr, "");
+    if (json) {
+      assert.deepEqual(JSON.parse(stdout).warnings, [{
+        code: "BACKUP_CLEANUP_FAILED",
+        message: "Catalog promotion succeeded, but backup cleanup was incomplete; residual recovery material may remain.",
+        diagnostic_backup_path: backup,
+      }]);
+    } else {
+      assert.ok(stdout.includes("Warning: [BACKUP_CLEANUP_FAILED] Catalog promotion succeeded, but backup cleanup was incomplete; residual recovery material may remain.\n"));
+      assert.ok(stdout.endsWith(`Backup recovery path: ${backup}\n`));
+    }
+  }
 });
 
 test("rejects physical source/output overlap through a directory link", async (t) => {
