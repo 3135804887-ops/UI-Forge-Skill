@@ -251,6 +251,36 @@ test("uses non-clickable fallback source identity with a runtime diagnostic", as
   });
 });
 
+test("removes legacy metadata URLs without altering functional code URLs", async () => {
+  const functionalCode = 'export function LinkedCard() { return <a href="https://functional.invalid/card">Open</a>; }';
+  await withLegacySource({
+    "card/Linked.json": legacy({
+      url: "https://legacy.invalid/@maker/components/linked-card",
+      title: "Linked Card",
+      description: "Based on https://metadata.invalid/card",
+      category: "card",
+      code_blocks: [{ index: 0, code: functionalCode }],
+    }),
+    "card/UrlOnly.json": legacy({
+      url: "https://legacy.invalid/@maker/components/url-only",
+      title: "URL Only",
+      description: "https://metadata.invalid/url-only",
+      category: "card",
+    }),
+  }, async (sourcePath) => {
+    const { records } = await loadLegacyRecords({ sourcePath });
+    const linked = records.find(({ title }) => title === "Linked Card");
+    const urlOnly = records.find(({ title }) => title === "URL Only");
+
+    assert.equal(linked.description, "Based on");
+    assert.equal(linked.code_blocks[0].code, functionalCode);
+    assert.match(linked.code_blocks[0].code, /https:\/\/functional\.invalid\/card/);
+    assert.ok(linked.diagnostics.some(({ code }) => code === "METADATA_URL_REMOVED"));
+    assert.equal(urlOnly.description, "External source description removed.");
+    assert.ok(records.every((record) => !containsMetadataUrl(record)));
+  });
+});
+
 test("filters malformed code blocks without losing valid blocks or stopping other records", async () => {
   await withLegacySource({
     "malformed/AllMalformed.json": legacy({
@@ -344,13 +374,16 @@ test("reports rejected records and preserves existing output when temporary vali
   await mkdir(output);
   await writeFile(join(output, "sentinel.txt"), "keep\n", "utf8");
 
-  await withLegacySource({
-    "bad/Missing.json": { title: "Missing URL", description: "No source.", category: "bad", code_blocks: [] },
-    "bad/MetadataUrl.json": legacy({ description: "Leaked https://metadata.invalid/value" }),
-  }, async (sourcePath) => {
+  await withLegacySource({ "good/Example.json": legacy() }, async (sourcePath) => {
     await assert.rejects(
-      buildCatalog({ sourcePath, outputPath: output }),
-      (error) => error?.code === "CATALOG_VALIDATION_FAILED" && error?.issues?.[0]?.code === "METADATA_URL",
+      buildCatalog({ sourcePath, outputPath: output }, {
+        catalogValidator: async () => ({
+          valid: false,
+          errors: [{ code: "INJECTED_VALIDATION_FAILURE", message: "injected validation failure" }],
+          warnings: [],
+        }),
+      }),
+      (error) => error?.code === "CATALOG_VALIDATION_FAILED" && error?.issues?.[0]?.code === "INJECTED_VALIDATION_FAILURE",
     );
   });
 
