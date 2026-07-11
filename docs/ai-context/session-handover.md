@@ -2,15 +2,18 @@
 
 ## Task status
 
+- Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
+- In progress (next): rewrite the skill trigger description against the immutable baseline, then rerun the same prompt matrix as forward tests.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
 - Completed: user approved the written first-round specification.
-- In progress (next): review and execute `docs/superpowers/plans/2026-07-11-ui-forge-first-round-implementation.md`. No `SKILL.md` behavior has been changed yet.
+- Superseded: the plan-review checkpoint moved into execution with the trigger baseline task; no `SKILL.md` behavior has been changed yet.
 - Blocked: none.
 
 ## Recent decisions
 
+- Freeze `tests/skill-trigger-cases.json` as the prompt matrix reused after the trigger rewrite; do not tune cases to the current classifications.
 - Treat the current repository as a prompt-driven component catalog adapter, not yet as a self-contained executable skill.
 - Preserve the component archive outside Git; inspect release assets from a temporary directory instead of committing or extracting them into the repository.
 - Use behavior tests before editing the skill instructions. Future skill changes should follow RED-GREEN-REFACTOR with baseline prompts and forward tests.
