@@ -2,8 +2,9 @@
 
 ## Task status
 
+- Completed: added the zero-dependency `validate`, `search`, and `show` CLI with strict argument parsing, stable JSON/human output, explicit related-category envelopes, exact-ID lookup, and exit codes `0`/`1`/`2`; focused and full tests pass.
+- In progress (next): normalize and repair legacy source records for deterministic catalog building.
 - Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
-- In progress (next): add the `validate`, `search`, and `show` CLI over catalog discovery, validation, loading, and deterministic search.
 - Completed: hardened catalog integrity after review with the Task 7 manifest-digest contract, normalized safe component paths, explicit containment checks, and complete discovery diagnostics.
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
@@ -20,6 +21,9 @@
 
 ## Recent decisions
 
+- Treat usage and catalog-validation failures as exit `1`, catalog discovery exhaustion as exit `2`, and successful validation/search/show (including zero search results) as exit `0`.
+- Serialize search suggestions as the explicit `relatedCategories` envelope field because the augmented search-array property is deliberately non-enumerable; `show` returns the selected stored record unchanged under `component`.
+- Keep successful output on stdout and all usage, discovery, validation, and lookup errors on stderr; JSON uses two-space indentation plus one trailing newline.
 - Score exact normalized titles once (+100), title token/prefix matches per unique query token (+30 each), and category exact (+25), slug (+20), description (+10), and dependency/author/code-role group (+5) matches once each; all scoring is additive.
 - Normalize search text with NFKC, locale-stable English case folding, and Unicode punctuation/whitespace collapsing; support prefix matching for all tokens and substring matching for CJK query tokens.
 - Return search results as code-free summary arrays with a non-enumerable `relatedCategories` property on every return path; on a category-filtered miss it holds normalized-deduplicated suggestions, and the CLI must copy it explicitly into its envelope.
@@ -66,6 +70,8 @@
 
 ## Key files
 
+- `scripts/ui-forge.mjs` — zero-dependency Node CLI for validation, search, exact-ID show, stable formatting, and exit-code handling.
+- `tests/catalog-cli.test.mjs` — process-level CLI coverage for JSON/human output, flags, errors, discovery diagnostics, and complete code preservation.
 - `lib/catalog-search.mjs` — Unicode query normalization, deterministic scoring/filtering/ordering, code-free summaries, and related-category suggestions.
 - `lib/catalog-integrity.mjs` — shared component-path normalization, containment resolution, and manifest digest contract.
 - `lib/catalog-loader.mjs` — strict deterministic loading plus non-throwing structured catalog validation.

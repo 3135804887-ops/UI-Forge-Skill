@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
++ Added the zero-dependency `validate`, `search`, and `show` catalog CLI with stable JSON and human-readable output.
++ Added process-level CLI regression coverage for exact-ID lookup, complete code preservation, search flags, empty results, invalid usage/catalogs, discovery diagnostics, and exit codes `0`/`1`/`2`.
+~ Copied the search result array's non-enumerable `relatedCategories` property into the stable CLI response envelope.
+# Successful commands write only to stdout; usage, discovery, validation, and lookup failures write only to stderr for reliable automation.
 + Added platform-neutral deterministic catalog search with Unicode normalization, weighted field scoring, status/category filtering, stable summaries, and related-category suggestions.
 ~ Formalized `relatedCategories` on every result array, deduplicated suggestions by normalized category, and isolated summary dependency arrays from source records.
 # Search reads titles, descriptions, categories, source identity, dependencies, and code-block roles, but never indexes or returns code bodies.
