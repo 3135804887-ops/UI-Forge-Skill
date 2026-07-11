@@ -5,8 +5,9 @@
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
-- In progress (next): user review of the written specification, followed by a detailed implementation plan. No `SKILL.md` behavior has been changed yet.
-- Blocked: implementation is intentionally gated on written-spec review.
+- Completed: user approved the written first-round specification.
+- In progress (next): review and execute `docs/superpowers/plans/2026-07-11-ui-forge-first-round-implementation.md`. No `SKILL.md` behavior has been changed yet.
+- Blocked: none.
 
 ## Recent decisions
 
