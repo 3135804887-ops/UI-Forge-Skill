@@ -2,6 +2,8 @@
 
 ## Task status
 
+- Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
+- In progress (next): add the `validate`, `search`, and `show` CLI over catalog discovery, validation, loading, and deterministic search.
 - Completed: hardened catalog integrity after review with the Task 7 manifest-digest contract, normalized safe component paths, explicit containment checks, and complete discovery diagnostics.
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
@@ -18,6 +20,10 @@
 
 ## Recent decisions
 
+- Score exact normalized titles once (+100), title token/prefix matches per unique query token (+30 each), and category exact (+25), slug (+20), description (+10), and dependency/author/code-role group (+5) matches once each; all scoring is additive.
+- Normalize search text with NFKC, locale-stable English case folding, and Unicode punctuation/whitespace collapsing; support prefix matching for all tokens and substring matching for CJK query tokens.
+- Return search results as code-free summary arrays with a non-enumerable `relatedCategories` property on every return path; on a category-filtered miss it holds normalized-deduplicated suggestions, and the CLI must copy it explicitly into its envelope.
+- Preserve the ordinal-smallest raw category as the display value for each normalized suggestion key, and clone dependency arrays in summaries so consumers cannot mutate loaded records.
 - Define the manifest digest as SHA-256 over newline-joined `<normalized relative path>\0<file sha256>` rows sorted by normalized path; fixtures, loaders, and the future builder share this contract through `lib/catalog-integrity.mjs`.
 - Reject drive-qualified, POSIX-absolute, backslash-absolute, and any `..` component paths before hashing or file I/O; resolve accepted paths and verify they remain below `<catalog>/components`.
 - Treat catalog discovery as a lightweight manifest check; full component parsing, digest verification, and record validation occur only during catalog loading.
@@ -60,6 +66,7 @@
 
 ## Key files
 
+- `lib/catalog-search.mjs` — Unicode query normalization, deterministic scoring/filtering/ordering, code-free summaries, and related-category suggestions.
 - `lib/catalog-integrity.mjs` — shared component-path normalization, containment resolution, and manifest digest contract.
 - `lib/catalog-loader.mjs` — strict deterministic loading plus non-throwing structured catalog validation.
 - `lib/catalog-config.mjs` — cross-platform config paths and ordered local catalog discovery.

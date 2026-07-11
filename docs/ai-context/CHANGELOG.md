@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added platform-neutral deterministic catalog search with Unicode normalization, weighted field scoring, status/category filtering, stable summaries, and related-category suggestions.
+~ Formalized `relatedCategories` on every result array, deduplicated suggestions by normalized category, and isolated summary dependency arrays from source records.
+# Search reads titles, descriptions, categories, source identity, dependencies, and code-block roles, but never indexes or returns code bodies.
 + Added shared catalog integrity helpers for normalized component paths, containment-safe resolution, and the Task 7 newline/NUL manifest digest contract.
 ~ Hardened catalog loading against traversal and absolute Windows/POSIX manifest paths, and made missing user config visible in discovery diagnostics.
 # Shared digest generation prevents fixture, loader, and future builder implementations from drifting apart.
