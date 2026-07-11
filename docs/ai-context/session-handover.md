@@ -2,6 +2,8 @@
 
 ## Task status
 
+- Completed: final-review Important 1 now passes at `1ebffa9`. After preserving a failed full round (`en-vue-migration`) and an interrupted calibration (`en-category-options`) as RED evidence, two minimal frontmatter/static-test fixes were made. A fully restarted set of 19 new `fork_turns:none` evaluators matched 19/19 verdicts and 13/13 baseline labels; all three broad negatives were stable 3/3 `no-trigger`.
+- Historical RED checkpoint: the first final-review rerun scored 18/19 individual verdicts and 12/13 labels because `en-vue-migration` falsely triggered. It is preserved in the raw evidence but superseded as current status by the complete 19/19 rerun at `1ebffa9`.
 - Completed: closed-world catalog packaging now derives its allowlist from the validated manifest plus the three fixed reports; rejects extra/missing/non-regular/linked entries and non-canonical paths; canonicalizes package paths physically; preserves CLI recovery state; and keeps the formal ZIP hash unchanged.
 - Completed: whole-branch status-consistency hardening now rejects confidence mismatches, unresolved-import diagnostics on complete/recoverable records, missing unresolved-import evidence on incomplete records, and code on invalid records. The builder reuses the schema-owned derivation/mapping; focused tests pass 60/60, its full-suite checkpoint passes 98/98, and the real 3,455-component catalog validates with no errors or warnings.
 - Completed: Task 10 added and review-hardened an automated legacy-to-build-to-validate/search/show-to-package scenario. Four distinct subprocess catalogs prove discovery precedence; exact code bytes/order/newline behavior, incomplete filtering, asset hashing, and generated/original isolation are asserted. Cross-platform `npm run check` and Windows/macOS/Linux CI cover Node 18/20/22; the full suite passes 93/93.
@@ -32,6 +34,8 @@
 
 ## Recent decisions
 
+- Treat the initial 19-run mismatch and the three-run interrupted calibration as preserved RED evidence, not current results. The current strict result is the complete restarted 19/19 run at `1ebffa9`; known UI Forge categories may trigger without an explicit React token, but arbitrary framework-unspecified options still do not.
+- Keep the prior review-expanded 18/18 distinct-prompt evaluation as historical coverage, but do not conflate it with the final strict baseline reproduction. Preserve the fresh `en-vue-migration` false positive unchanged as the RED finding resolved by `b0a9900`, not as an open current mismatch.
 - Treat the package as a closed world: require `manifest.json` and every exact `components/<manifest path>` entry; allow only optional `reports/build-report.json`, `reports/duplicate-groups.json`, and `reports/rejected-records.json`; reject everything else.
 - Require canonical forward-slash manifest paths with no backslash, empty, `.`, or `..` segment, and require each final component realpath to remain under a canonical real `components/` directory without symlink/junction segments.
 - Canonicalize package source and prospective ZIP/checksum paths through realpath or the nearest existing physical ancestor before containment and distinctness checks.

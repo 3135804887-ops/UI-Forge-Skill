@@ -2,6 +2,13 @@
 
 ## 2026-07-11
 
++ Completed a new uninterrupted 19-agent trigger rerun at `1ebffa9`: 19/19 individual verdicts and 13/13 original baseline labels matched, including 3/3 `no-trigger` for each broad negative.
+~ Explicitly exclude all framework migrations even when React is the target, and narrowly recognize existing options in known UI Forge catalog categories such as shader background.
++ Added static RED/GREEN contracts for both final-review trigger ambiguities; preserved the failed first round and interrupted three-run calibration alongside the final raw evidence.
+# The earlier 18/18 review-expanded distinct-prompt matrix remains separate evidence and is not counted in the final 19-run reproduction.
++ Re-ran the approved 13-prompt after-trigger baseline with exactly 19 isolated fresh-context evaluators and recorded every agent verdict and rationale.
+~ Corrected the final trigger claim to the observed result: 18/19 individual verdicts and 12/13 baseline labels matched; all three broad negatives remained stable at 3/3 `no-trigger`, while `en-vue-migration` produced the sole false positive.
+# The earlier review-expanded 18/18 distinct-prompt matrix remains separate historical coverage; no skill or test content was changed during this evidence-only rerun.
 + Hardened catalog packaging to a validated-manifest closed world: only `manifest.json`, exact manifest component files, and the three fixed builder reports may enter the ZIP.
 ~ Reject non-canonical manifest paths, symlink/junction and non-regular component entries, and physical source/output/checksum overlap through aliased ancestors.
 ~ Preserve package promotion `state` and `recovery_paths` in CLI JSON failures and replace locale collation with normalized ordinal search ordering.
