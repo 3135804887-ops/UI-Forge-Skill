@@ -3,6 +3,9 @@
 ## 2026-07-11
 
 + Added a deterministic Node ZIP packager with fixed entry metadata, sorted root-relative paths, checksum output, no wrapper directory, and regression coverage proving source mtimes do not affect archive bytes.
+~ Hardened ZIP/checksum publication into a paired recoverable promotion with unique sibling backups, rollback state and recovery paths, preserved incomplete-rollback material, and non-fatal post-success cleanup warnings in JSON/human CLI output.
++ Added direct ZIP-format and fault-injection regressions for entry ordering, fixed timestamps/permissions, exact checksum bytes, backup/promotion failures, incomplete rollback, and cleanup warnings.
+# The hardened transaction did not change the formal package bytes or SHA-256.
 ~ Extended legacy code-block loading to accept the string arrays used by the real v1.0 catalog while retaining structured recovery blocks and exact functional code content.
 + Recorded full-catalog evidence: 4,360 inputs account for 3,455 emitted + 905 merged + 0 rejected, all 25,885 usable source blocks are represented, and independent builds and ZIPs are byte-identical.
 # Shared catalog build/packaging interface: final content digest is `89ea5545695e22b57b57b75ddd403aabad9245119d0ebab0a3dce0d80da89f25`; the exploratory `626ba7d...` output was invalidated because it dropped normal string code blocks.

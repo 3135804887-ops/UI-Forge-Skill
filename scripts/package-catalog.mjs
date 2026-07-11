@@ -1,14 +1,11 @@
 #!/usr/bin/env node
-import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { validateCatalog } from "../lib/catalog-loader.mjs";
-import { createDeterministicZip } from "../lib/deterministic-zip.mjs";
+import { packageCatalog } from "../lib/deterministic-zip.mjs";
 
-function fail(message) {
-  process.stderr.write(`${message}\n`);
-  process.exitCode = 1;
-}
+const USAGE = "node scripts/package-catalog.mjs --source PATH --output FILE [--checksum FILE] [--json]";
 
 function parseArgs(argv) {
   const options = { json: false };
@@ -21,19 +18,44 @@ function parseArgs(argv) {
       options[arg.slice(2)] = value;
     } else throw new Error(`unknown argument: ${arg}`);
   }
-  if (!options.source || !options.output) throw new Error("usage: package-catalog --source PATH --output FILE [--checksum FILE] [--json]");
+  if (!options.source || !options.output) throw new Error(`usage: ${USAGE}`);
   return options;
 }
 
-try {
-  const options = parseArgs(process.argv.slice(2));
-  const validation = await validateCatalog(options.source);
-  if (!validation.valid) throw new Error(`catalog validation failed with ${validation.errors.length} error(s)`);
-  const result = await createDeterministicZip({ sourcePath: options.source, outputPath: options.output });
-  const checksum = resolve(options.checksum ?? `${options.output}.sha256`);
-  await writeFile(checksum, `${result.sha256}  ${resolve(options.output).split(/[\\/]/).at(-1)}\n`, "utf8");
-  const summary = { ...result, checksum };
-  process.stdout.write(options.json ? `${JSON.stringify(summary, null, 2)}\n` : `Packaged ${result.file_count} files (${result.size} bytes)\nSHA-256 ${result.sha256}\n`);
-} catch (error) {
-  fail(error.message);
+function human(result) {
+  const lines = [
+    `Packaged ${result.file_count} files (${result.size} bytes)`,
+    `SHA-256 ${result.sha256}`,
+    `Checksum ${result.checksum}`,
+  ];
+  for (const warning of result.warnings) {
+    lines.push(`Warning: [${warning.code}] ${warning.message}`);
+    lines.push(`Backup recovery path: ${warning.diagnostic_backup_path}`);
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+/** @internal Injectable runner for process wiring and fault-path tests. */
+export async function runPackageCli(rawArgs, io = process, internalDependencies = {}) {
+  const wantsJson = rawArgs.includes("--json");
+  try {
+    const options = parseArgs(rawArgs);
+    const validation = await validateCatalog(options.source);
+    if (!validation.valid) throw new Error(`catalog validation failed with ${validation.errors.length} error(s)`);
+    const result = await packageCatalog(
+      { sourcePath: options.source, outputPath: options.output, checksumPath: options.checksum },
+      internalDependencies,
+    );
+    io.stdout.write(options.json ? `${JSON.stringify(result, null, 2)}\n` : human(result));
+    return 0;
+  } catch (error) {
+    if (wantsJson) io.stderr.write(`${JSON.stringify({ error: error.message, code: error.code ?? "PACKAGE_FAILED", usage: USAGE }, null, 2)}\n`);
+    else io.stderr.write(`Error: ${error.message}\nUsage: ${USAGE}\n`);
+    return 1;
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exitCode = await runPackageCli(process.argv.slice(2));
 }
