@@ -5,6 +5,7 @@
   "type": "module",
   "engines": { "node": ">=18" },
   "scripts": {
+    "check": "node --test",
     "test": "node --test",
     "ui-forge": "node scripts/ui-forge.mjs",
     "build:catalog": "node scripts/build-catalog.mjs",

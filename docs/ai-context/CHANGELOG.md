@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
++ Added a realistic zero-dependency end-to-end regression covering legacy conversion, deterministic repeated builds, CLI/environment/project discovery, `validate/search/show`, complete reconstruction input, URL policy, and byte-identical packages.
++ Added the shared `npm run check` validation entry and Windows/macOS/Linux CI coverage for Node 18, 20, and 22.
++ Recorded independent full-catalog forward evidence for honest incomplete-component selection and an external generated-vs-original reconstruction fixture whose offline build passes.
+~ Reconciled contributor, README, release, and handover guidance with the platform-neutral core, local catalog lifecycle, TDD fixture rules, URL-free runtime schema, and future cleaned asset status.
+# Shared validation interface: contributors and CI now use `npm run check`; no catalog release was published by this change.
 + Added a deterministic Node ZIP packager with fixed entry metadata, sorted root-relative paths, checksum output, no wrapper directory, and regression coverage proving source mtimes do not affect archive bytes.
 ~ Hardened ZIP/checksum publication into a paired recoverable promotion with unique sibling backups, rollback state and recovery paths, preserved incomplete-rollback material, and non-fatal post-success cleanup warnings in JSON/human CLI output.
 + Added direct ZIP-format and fault-injection regressions for entry ordering, fixed timestamps/permissions, exact checksum bytes, backup/promotion failures, incomplete rollback, and cleanup warnings.

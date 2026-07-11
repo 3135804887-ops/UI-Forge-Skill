@@ -54,10 +54,10 @@ The builder repairs recoverable data, groups duplicates by source identity, stor
 ## Development
 
 ```bash
-npm test
+npm run check
 ```
 
-The runtime and tests use only Node built-in modules. Format and reconstruction details are documented progressively in [references/catalog-format.md](references/catalog-format.md) and [references/integration-workflow.md](references/integration-workflow.md). The category mapping has a single canonical copy in [references/categories.md](references/categories.md).
+`npm test` runs the same Node test suite. CI executes this cross-platform check on Windows, macOS, and Linux with supported Node versions beginning at Node 18. The runtime and tests use only Node built-in modules. Format and reconstruction details are documented progressively in [references/catalog-format.md](references/catalog-format.md) and [references/integration-workflow.md](references/integration-workflow.md). The category mapping has a single canonical copy in [references/categories.md](references/categories.md).
 
 ## 中文摘要
 

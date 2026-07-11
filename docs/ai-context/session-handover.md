@@ -2,6 +2,10 @@
 
 ## Task status
 
+- Completed: Task 10 added an automated legacy-to-build-to-validate/search/show-to-package scenario, a cross-platform `npm run check` entry, and Windows/macOS/Linux CI on Node 18/20/22; the full suite passes 91/91.
+- Completed: two independent forward scenarios used the full cleaned catalog. The read-only selector chose `button/motion-button--64c491c2` only after explicitly including incomplete records and reported its missing implementation honestly; the reconstruction scenario preserved `button/animated-button--02ab4c4a` original code outside Git, labeled every generated file, and passed its offline fixture build.
+- Completed: reconciled contributor and release notes with the platform-neutral core, real CLI/build/package flow, TDD fixture policy, URL-free runtime metadata, current legacy asset, and future cleaned release without claiming publication.
+- Completed: final local verification passed `quick_validate`, `npm run check`, full catalog validation (schema 1, 3,455 components, no errors/warnings), `git diff --check`, hard-coded-path/URL scans, and tracked-large/generated-artifact checks.
 - Completed: validated the entire v1.0 archive after adding real-data string-code-block compatibility; final accounting is 4,360 input = 3,455 emitted + 905 merged + 0 rejected, with 99 complete and 3,356 incomplete records, all 25,885 usable code blocks represented, and no runtime metadata URLs or duplicate text storage.
 - Completed: repeated the full build into an independent directory with identical manifest digest, relative paths, per-file SHA-256 values, and report bytes; added a cross-platform deterministic ZIP packager whose independent outputs are byte-identical and whose extracted catalog validates successfully.
 - Completed: review-hardened ZIP/checksum publication as one recoverable transaction with unique sibling backups, paired rollback, incomplete-rollback recovery state, non-fatal post-success cleanup warnings, CLI warning output, and direct ZIP-format contract tests; the formal ZIP hash remains unchanged.
@@ -15,7 +19,7 @@
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
 - Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; at that historical baseline all 7 negative cases over-triggered, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
-- Next: execute Task 10 realistic forward scenarios, reconcile contributor/release documentation, run final verification, and prepare the branch for review without publishing a release.
+- Next: run the whole-branch review, address any findings, then choose merge/PR integration without publishing a catalog release.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
@@ -25,6 +29,9 @@
 
 ## Recent decisions
 
+- Use `npm run check` as the platform-neutral repository validation entry and run it in CI on Windows, macOS, and Linux starting at Node 18; keep it shell-neutral as `node --test`.
+- Treat empty default search for animated buttons as truthful status filtering, not a search failure. Assistants may retry with `--include-incomplete`, but must preserve diagnostics and label missing implementation code as generated reconstruction.
+- Keep realistic reconstruction fixtures outside Git. Preserve catalog blocks unchanged in an original inventory and place inferred files plus assumptions in a visibly separate generated directory.
 - Accept both legacy string code blocks and `{ code }` objects; v1.0 normal records use strings, while recovery and fixtures use structured blocks. Preserve code text while normalizing line endings deterministically.
 - Treat `89ea5545695e22b57b57b75ddd403aabad9245119d0ebab0a3dce0d80da89f25` as the only valid full-catalog digest. The earlier `626ba7d...` exploratory output discarded v1.0 string blocks and is invalidated.
 - Package catalogs with the Node deterministic ZIP writer, ordinal paths, fixed timestamps/permissions, and no wrapper directory; do not use platform archive utilities for release-byte reproducibility.
@@ -98,6 +105,10 @@
 
 ## Key files
 
+- `.github/workflows/validate.yml` and `package.json` — cross-platform Node 18+ automated validation entry.
+- `tests/real-world-scenarios.test.mjs` — lightweight end-to-end legacy build, discovery, CLI reconstruction, URL policy, and deterministic package regression.
+- `docs/ai-context/evals/forward-tests.md` — independent full-catalog selection and incomplete reconstruction evidence.
+- `CONTRIBUTING.md` and `RELEASE_NOTES.md` — current contribution, runtime-data, and not-yet-published release contract.
 - `lib/deterministic-zip.mjs` and `scripts/package-catalog.mjs` — zero-dependency cross-platform deterministic ZIP output and checksum CLI.
 - `tests/catalog-package.test.mjs` — archive-byte determinism regression independent of source mtimes.
 - `docs/ai-context/evals/full-catalog-build.md` — complete real-data accounting, integrity, CLI, repeat-build, and package evidence.
@@ -125,7 +136,6 @@
 
 ## Open questions
 
-- Is the primary target Codex/Agent Skills, Claude Code, or a genuinely portable multi-assistant format?
-- Should the catalog remain a separately downloaded asset, become a generated index, or be queried remotely?
 - What licenses and attribution requirements apply to the scraped 21st.dev component sources?
-- Which user workflows matter most: component lookup, full-page composition, repository integration, or catalog maintenance?
+- When should the verified cleaned catalog and checksum be published as a release asset?
+- Should a future catalog iteration improve complete implementation coverage for common button queries before expanding to more platforms?

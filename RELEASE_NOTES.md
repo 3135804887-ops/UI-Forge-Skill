@@ -1,101 +1,37 @@
-# UI Forge v1.0.0 - Initial Release
+# UI Forge release notes
 
-## Overview
+## 1.1.0 — prepared, not published
 
-First stable release of UI Forge - a professional component library skill for Claude Code.
+This branch prepares a platform-neutral UI Forge skill and a separately installed cleaned catalog format. It does not publish a GitHub Release or commit the generated catalog.
 
-## What's Included
+### Skill and runtime
 
-- 4360+ production-ready React components
-- 47 organized categories
-- Complete documentation (English + Chinese)
-- Installation guides
-- Usage examples
-- MIT License
+- Narrowed activation to explicit ready-made React component discovery/reuse or explicit UI Forge requests, with bilingual trigger and non-trigger regression evidence.
+- Added a Node 18+ zero-runtime-dependency CLI with deterministic `validate`, `search`, and exact-ID `show` commands.
+- Added cross-platform catalog discovery with CLI, environment, nearest project config, user config, and common install precedence.
+- Added thin Codex and Claude Code adapters that share the same skill, CLI, catalog schema, and reconstruction rules.
+- Moved detailed configuration, schema, categories, and integration guidance into progressive references.
 
-## Features
+### Cleaned catalog tooling
 
-### Massive Component Library
-- Cards, buttons, forms, inputs
-- Navigation, menus, modals
-- Charts, calendars, date pickers
-- Animations, shaders, effects
-- And 40+ more categories
+- Added a deterministic legacy-to-runtime builder that repairs recoverable malformed input, merges duplicate sources, extracts dependencies and local imports, and records completeness diagnostics.
+- Runtime schema version 1 stores each component once, keeps all original code in `code_blocks[].code`, removes duplicate `_code_*.txt` representations, and rejects metadata URLs.
+- Functional URLs remain unchanged only when they are part of component code; metadata stores hash identities instead.
+- Added validation-gated atomic catalog promotion and a deterministic ZIP/checksum packager with recoverable pair promotion.
 
-### Smart Integration
-- AI-powered component discovery
-- Context-aware recommendations
-- Complete code with dependencies
-- Customization guidance
+The verified local migration accounted for all 4,360 legacy JSON inputs as 3,455 emitted records plus 905 merged records and zero rejections. The cleaned catalog contains 99 complete and 3,356 incomplete records. Independent builds and packages were byte-identical. These figures describe local verification evidence, not a published asset.
 
-### Production Ready
-- Modern React patterns
-- TypeScript support
-- Tailwind CSS styling
-- Responsive design
-- Accessibility built-in
+### Installing the data package
 
-## Installation
-
-### Quick Start
+The currently available v1.0 archive is legacy builder input, not a runtime catalog. Extract it outside this repository, then run:
 
 ```bash
-# Clone repository
-git clone git@github.com:3135804887-ops/UI-Forge-Skill.git
-cd UI-Forge-Skill
-
-# Install to Claude skills directory
-# macOS/Linux
-cp -r . ~/.claude/skills/ui-forge
-
-# Windows
-xcopy . %USERPROFILE%\.claude\skills\ui-forge /E /I
+node scripts/build-catalog.mjs --source "/absolute/legacy/source" --output "/absolute/clean/catalog" --json
+node scripts/ui-forge.mjs validate --catalog "/absolute/clean/catalog" --json
 ```
 
-### Component Library Setup
+A future cleaned release asset may be extracted and validated directly. Before publishing it, maintainers must repeat the full accounting, deterministic build/package comparison, checksum verification, and realistic `validate → search → show` scenarios documented under `docs/ai-context/evals/`.
 
-1. Download component library (see below)
-2. Extract to a local directory
-3. Update path in SKILL.md
+## 1.0.0 — historical legacy archive
 
-## Downloads
-
-- Skill Package: Download from Assets below
-- Component Library: Available separately (154MB)
-
-## Documentation
-
-- README.md - Complete usage guide (English + Chinese)
-- CATEGORIES.md - All 47 categories detailed
-- CONTRIBUTING.md - Contribution guidelines
-- examples/landing-page.md - Complete tutorial
-
-## Technical Stack
-
-- React 18+
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Lucide React
-- shadcn/ui
-
-## What's Next
-
-Future releases will include:
-- More component variations
-- Additional examples
-- Enhanced documentation
-- Community contributions
-
-## Support
-
-- Report issues: https://github.com/3135804887-ops/UI-Forge-Skill/issues
-- Discussions: https://github.com/3135804887-ops/UI-Forge-Skill/discussions
-
-## License
-
-MIT License - Free for personal and commercial use
-
----
-
-Thank you for using UI Forge! If this skill helps you build faster, please give us a star on GitHub.
+The initial release supplied the original skill documentation and a separate legacy component archive organized into 47 categories. Its catalog shape includes duplicated companion text files and does not satisfy the 1.1 runtime schema. Claims about accessibility, licensing, browser support, testing, or production readiness are not implied by the legacy metadata and must be evaluated per selected component and target project.
