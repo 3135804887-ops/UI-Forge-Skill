@@ -2,8 +2,10 @@
 
 ## Task status
 
+- Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
+- Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
+- In progress (next): build deterministic search and reconstruction behavior on top of the loaded catalog records.
 - Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
-- In progress (next): implement deterministic catalog loading and platform-neutral discovery on top of the stable schema interfaces.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
 - In progress (next): rewrite the skill trigger description against the immutable baseline, then rerun the same prompt matrix as forward tests.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
@@ -15,6 +17,8 @@
 
 ## Recent decisions
 
+- Treat catalog discovery as a lightweight manifest check; full component parsing, digest verification, and record validation occur only during catalog loading.
+- Use platform-specific config/data roots plus `~/.ui-forge/catalog` as deterministic common install candidates; relative config values resolve from the owning config file.
 - Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
 - Freeze `tests/skill-trigger-cases.json` as the prompt matrix reused after the trigger rewrite; do not tune cases to the current classifications.
 - Treat the current repository as a prompt-driven component catalog adapter, not yet as a self-contained executable skill.
@@ -53,6 +57,8 @@
 
 ## Key files
 
+- `lib/catalog-loader.mjs` — strict deterministic loading plus non-throwing structured catalog validation.
+- `lib/catalog-config.mjs` — cross-platform config paths and ordered local catalog discovery.
 - `lib/catalog-schema.mjs` — schema constants, record/manifest validators, and metadata URL detection.
 - `tests/helpers.mjs` — deterministic temporary catalog and child-process test helpers.
 - `SKILL.md` — current skill trigger, catalog summary, and manual integration workflow.

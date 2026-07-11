@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added deterministic catalog loading with manifest and component SHA-256 verification, record validation, duplicate-ID detection, and structured validation results.
++ Added catalog discovery precedence across CLI, environment, nearest project config, platform-specific user config, and common install locations.
+# Discovery checks only readable supported manifests; full catalog integrity validation remains the loader's responsibility.
 + Added committed regression coverage for source identity, statuses, confidence bounds, arrays, code blocks, diagnostics, manifests, and all test helpers.
 ~ Expanded metadata URI detection beyond HTTP(S) schemes and narrowed the functional-URL exemption to direct `code_blocks[].code` strings.
 # Nested metadata, including `code_blocks[].extra.code`, must not inherit the canonical code exemption.
