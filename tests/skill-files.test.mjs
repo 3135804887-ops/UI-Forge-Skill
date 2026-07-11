@@ -11,12 +11,12 @@ test("skill trigger is narrow and platform-neutral", async () => {
   assert.ok(skill.split(/\s+/).length <= 650);
 });
 
-test("frontmatter itself excludes non-React category-option requests", async () => {
+test("frontmatter itself excludes non-React options and framework migrations", async () => {
   const skill = await read("SKILL.md");
   const description = skill.match(/^description: (.+)$/m)?.[1];
   assert.equal(
     description,
-    "Use when the user explicitly asks to find, compare, select, or reuse ready-made React UI components, asks which existing React components are available from a local component catalog, or explicitly requests UI Forge; do not use for Vue, SwiftUI, native HTML, or other non-React component requests.",
+    "Use when the user explicitly asks to find, compare, select, or reuse ready-made React UI components, asks which existing React components are available from a local component catalog, or explicitly requests UI Forge; do not use for framework migrations even when React is the target, or for Vue, SwiftUI, native HTML, or other non-React component requests.",
   );
 });
 

@@ -1,6 +1,6 @@
 ---
 name: ui-forge
-description: Use when the user explicitly asks to find, compare, select, or reuse ready-made React UI components, asks which existing React components are available from a local component catalog, or explicitly requests UI Forge; do not use for Vue, SwiftUI, native HTML, or other non-React component requests.
+description: Use when the user explicitly asks to find, compare, select, or reuse ready-made React UI components, asks which existing React components are available from a local component catalog, or explicitly requests UI Forge; do not use for framework migrations even when React is the target, or for Vue, SwiftUI, native HTML, or other non-React component requests.
 ---
 
 # UI Forge
