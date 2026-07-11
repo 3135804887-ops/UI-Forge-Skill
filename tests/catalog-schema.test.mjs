@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   SCHEMA_VERSION,
+  STATUS_CONTRACT,
   STATUS_RANK,
   containsMetadataUrl,
   isValidComponentId,
@@ -29,6 +30,12 @@ const validRecord = {
 test("exports schema version and stable status order", () => {
   assert.equal(SCHEMA_VERSION, 1);
   assert.deepEqual(STATUS_RANK, { complete: 0, recoverable: 1, incomplete: 2, invalid: 3 });
+  assert.deepEqual(STATUS_CONTRACT, {
+    complete: { confidence: 1, code: "required", unresolved_local_import: "forbidden" },
+    recoverable: { confidence: 0.85, code: "required", unresolved_local_import: "forbidden" },
+    incomplete: { confidence: 0.5, code: "required", unresolved_local_import: "required" },
+    invalid: { confidence: 0, code: "forbidden", unresolved_local_import: "forbidden" },
+  });
 });
 
 test("accepts a valid component and manifest", () => {
@@ -83,10 +90,26 @@ test("validates source identity fields", () => {
   assert.ok(badSourceId.some((x) => x.code === "INVALID_SOURCE_ID"));
 });
 
-test("accepts every status and enforces confidence bounds", () => {
-  for (const status of ["complete", "recoverable", "incomplete", "invalid"]) {
-    assert.deepEqual(validateRecord({ ...validRecord, status }), []);
+test("enforces the centralized status, confidence, code, and diagnostic contract", () => {
+  const unresolved = { code: "UNRESOLVED_LOCAL_IMPORT", message: "Missing local module." };
+  const validByStatus = {
+    complete: { ...validRecord },
+    recoverable: { ...validRecord, status: "recoverable", confidence: 0.85 },
+    incomplete: { ...validRecord, status: "incomplete", confidence: 0.5, diagnostics: [unresolved] },
+    invalid: { ...validRecord, status: "invalid", confidence: 0, code_blocks: [] },
+  };
+  for (const [status, record] of Object.entries(validByStatus)) {
+    assert.deepEqual(validateRecord(record), [], status);
+    assert.ok(
+      validateRecord({ ...record, confidence: record.confidence === 0 ? 1 : 0 }).some((x) => x.code === "STATUS_CONFIDENCE_MISMATCH"),
+      `${status} must reject mismatched confidence`,
+    );
   }
+  for (const status of ["complete", "recoverable"]) {
+    assert.ok(validateRecord({ ...validByStatus[status], diagnostics: [unresolved] }).some((x) => x.code === "STATUS_DIAGNOSTIC_MISMATCH"));
+  }
+  assert.ok(validateRecord({ ...validByStatus.invalid, code_blocks: validRecord.code_blocks }).some((x) => x.code === "STATUS_CODE_MISMATCH"));
+  assert.ok(validateRecord({ ...validByStatus.incomplete, diagnostics: [] }).some((x) => x.code === "STATUS_DIAGNOSTIC_MISMATCH"));
   assert.ok(validateRecord({ ...validRecord, confidence: -0.01 }).some((x) => x.code === "INVALID_CONFIDENCE"));
   assert.ok(validateRecord({ ...validRecord, confidence: 1.01 }).some((x) => x.code === "INVALID_CONFIDENCE"));
   assert.ok(validateRecord({ ...validRecord, confidence: Number.NaN }).some((x) => x.code === "INVALID_CONFIDENCE"));

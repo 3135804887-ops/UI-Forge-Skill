@@ -2,6 +2,7 @@
 
 ## Task status
 
+- Completed: whole-branch status-consistency hardening now rejects confidence mismatches, unresolved-import diagnostics on complete/recoverable records, missing unresolved-import evidence on incomplete records, and code on invalid records. The builder reuses the schema-owned derivation/mapping; focused tests pass 60/60, its full-suite checkpoint passes 98/98, and the real 3,455-component catalog validates with no errors or warnings.
 - Completed: Task 10 added and review-hardened an automated legacy-to-build-to-validate/search/show-to-package scenario. Four distinct subprocess catalogs prove discovery precedence; exact code bytes/order/newline behavior, incomplete filtering, asset hashing, and generated/original isolation are asserted. Cross-platform `npm run check` and Windows/macOS/Linux CI cover Node 18/20/22; the full suite passes 93/93.
 - Completed: two independent forward scenarios used the full cleaned catalog. The read-only selector chose `button/motion-button--64c491c2` only after explicitly including incomplete records and reported its missing implementation honestly; the reconstruction scenario preserved `button/animated-button--02ab4c4a` original code outside Git, labeled every generated file, and passed the offline structural verifier. It did not run a JSX compiler, React runtime, TypeScript compiler, or bundler.
 - Completed: reconciled contributor and release notes with the platform-neutral core, real CLI/build/package flow, TDD fixture policy, URL-free runtime metadata, current legacy asset, and future cleaned release without claiming publication.
@@ -30,6 +31,7 @@
 
 ## Recent decisions
 
+- Treat status as a schema invariant coupled to confidence, code presence, and `UNRESOLVED_LOCAL_IMPORT`: complete=`1`/code/forbid unresolved, recoverable=`0.85`/code/forbid unresolved, incomplete=`0.5`/code/require unresolved, invalid=`0`/no code/forbid unresolved. Keep the mapping and derivation in `catalog-schema`; builders and validators must reuse it rather than copy it.
 - Use `npm run check` as the platform-neutral repository validation entry and run it in CI on Windows, macOS, and Linux starting at Node 18; keep it shell-neutral as `node --test`.
 - Treat empty default search for animated buttons as truthful status filtering, not a search failure. Assistants may retry with `--include-incomplete`, but must preserve diagnostics and label missing implementation code as generated reconstruction.
 - Keep realistic reconstruction fixtures outside Git. Preserve catalog blocks unchanged in an original inventory and place inferred files plus assumptions in a visibly separate generated directory.
@@ -69,7 +71,7 @@
 - Reject drive-qualified, POSIX-absolute, backslash-absolute, and any `..` component paths before hashing or file I/O; resolve accepted paths and verify they remain below `<catalog>/components`.
 - Treat catalog discovery as a lightweight manifest check; full component parsing, digest verification, and record validation occur only during catalog loading.
 - Use platform-specific config/data roots plus `~/.ui-forge/catalog` as deterministic common install candidates; relative config values resolve from the owning config file.
-- Treat `SCHEMA_VERSION`, `STATUS_RANK`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
+- Treat `SCHEMA_VERSION`, `STATUS_RANK`, `STATUS_CONTRACT`, `deriveReconstructionStatus`, `validateRecord`, `validateManifest`, and `containsMetadataUrl` as stable runtime interfaces; fixture and validation ordering uses locale-independent string comparison, and only the direct `code_blocks[].code` value is exempt from metadata URI detection.
 - Preserve the original 13 trigger cases as the baseline; add new adversarial classes without tuning the original prompts to observed classifications.
 - Historical initial-audit view: before Tasks 2–8, the repository was a prompt-driven catalog adapter rather than a self-contained executable skill.
 - Preserve the component archive outside Git; inspect release assets from a temporary directory instead of committing or extracting them into the repository.

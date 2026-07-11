@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
++ Added schema, loader, and CLI regressions that reject mismatched reconstruction status, confidence, code presence, and unresolved-import diagnostics.
+~ Centralized the four reconstruction-status invariants in `catalog-schema` and made the builder derive status and confidence from that single contract.
+# Shared schema contract: complete=`1`, recoverable=`0.85`, incomplete=`0.5`, invalid=`0`; only incomplete requires `UNRESOLVED_LOCAL_IMPORT`, and invalid records forbid code.
 ~ Corrected the Motion Button example to its observed `examples/demo-demo.jsx` suggested path and pinned the real ID/path in static documentation tests.
 ~ Standardized handover evidence as an offline structural verifier and explicitly excluded JSX, React runtime, TypeScript, and bundler execution.
 + Hardened the real-world subprocess regression with four distinguishable catalogs proving CLI/environment/nearest-project precedence, default incomplete filtering, exact ordered code-block bytes, functional-resource hashes, and generated/original filesystem isolation.

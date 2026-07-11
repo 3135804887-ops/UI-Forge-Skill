@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { isValidComponentId } from "../lib/catalog-schema.mjs";
+import { isValidComponentId, STATUS_CONTRACT } from "../lib/catalog-schema.mjs";
 import { createFixtureCatalog, makeTempDir, runNode } from "./helpers.mjs";
 
 const cli = "scripts/ui-forge.mjs";
@@ -31,6 +31,7 @@ function makeRecord({
 }) {
   const slug = id.split("/")[1].split("--")[0];
   const hashCharacter = id.at(-1);
+  const confidence = STATUS_CONTRACT[status].confidence;
   return {
     schema_version: 1,
     id,
@@ -40,18 +41,20 @@ function makeRecord({
     source: { provider: "fixture", author: "maker", slug },
     source_id: `sha256:${hashCharacter.repeat(64)}`,
     status,
-    confidence: 1,
+    confidence,
     dependencies,
     local_imports: localImports,
     external_assets: [],
-    code_blocks: codeBlocks ?? [{
+    code_blocks: codeBlocks ?? (status === "invalid" ? [] : [{
       index: 0,
       language: "jsx",
       role: "component",
       suggested_path: `src/${slug}.jsx`,
       code: `export const ${slug.replaceAll("-", "_")} = true;`,
-    }],
-    diagnostics: [],
+    }]),
+    diagnostics: status === "incomplete"
+      ? [{ code: "UNRESOLVED_LOCAL_IMPORT", message: "Fixture local import is unresolved." }]
+      : [],
   };
 }
 
@@ -105,6 +108,16 @@ test("validate emits stable JSON", async (t) => {
     errors: [],
     warnings: [],
   });
+});
+
+test("validate rejects a status-confidence mismatch", async (t) => {
+  const catalog = await makeTempDir("ui-forge-cli-status-");
+  t.after(() => rm(catalog, { recursive: true, force: true }));
+  await createFixtureCatalog(catalog, [{ ...shimmer, confidence: 0 }]);
+  const result = await runNode([cli, "validate", "--catalog", catalog, "--json"]);
+  assert.equal(result.code, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(JSON.parse(result.stderr).errors[0].code, "STATUS_CONFIDENCE_MISMATCH");
 });
 
 test("search returns summaries without code and copies related categories", async (t) => {

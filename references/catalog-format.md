@@ -8,12 +8,12 @@ Schema version 1 records include `id`, title, description, category, non-clickab
 
 Statuses are:
 
-- `complete`: usable implementation with no unresolved local imports.
-- `recoverable`: source records or companion blocks supplied a deterministic repair.
-- `incomplete`: useful code exists but project-side completion is required.
-- `invalid`: no reliable usable code was recovered.
+- `complete`: confidence `1`; code is required and `UNRESOLVED_LOCAL_IMPORT` is forbidden.
+- `recoverable`: confidence `0.85`; repaired code is required and `UNRESOLVED_LOCAL_IMPORT` is forbidden.
+- `incomplete`: confidence `0.5`; code and at least one `UNRESOLVED_LOCAL_IMPORT` diagnostic are required.
+- `invalid`: confidence `0`; code and `UNRESOLVED_LOCAL_IMPORT` are forbidden because no reliable usable code was recovered.
 
-Confidence measures source completeness, not quality. The catalog does not assert testing, accessibility, licensing, or deployment suitability without evidence.
+These status, confidence, code, and diagnostic relationships are schema invariants, not display hints. Confidence measures source completeness, not quality. The catalog does not assert testing, accessibility, licensing, or deployment suitability without evidence.
 
 ## Source and URL policy
 

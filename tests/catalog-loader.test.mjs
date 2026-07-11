@@ -140,3 +140,21 @@ test("preserves parse and unreadable catalog error codes", async (t) => {
   assert.equal(result.valid, false);
   assert.equal(result.errors[0].code, "CATALOG_NOT_FOUND");
 });
+
+test("rejects records whose reconstruction status contract is inconsistent", async (t) => {
+  const unresolved = { code: "UNRESOLVED_LOCAL_IMPORT", message: "Missing local module." };
+  const cases = [
+    { name: "complete confidence zero", record: { ...recordA, confidence: 0 }, code: "STATUS_CONFIDENCE_MISMATCH" },
+    { name: "complete unresolved import", record: { ...recordA, diagnostics: [unresolved] }, code: "STATUS_DIAGNOSTIC_MISMATCH" },
+    { name: "recoverable unresolved import", record: { ...recordA, status: "recoverable", confidence: 0.85, diagnostics: [unresolved] }, code: "STATUS_DIAGNOSTIC_MISMATCH" },
+    { name: "invalid with code", record: { ...recordA, status: "invalid", confidence: 0 }, code: "STATUS_CODE_MISMATCH" },
+  ];
+  for (const fixture of cases) {
+    await t.test(fixture.name, async () => {
+      const root = await withCatalog(t, [fixture.record]);
+      const result = await validateCatalog(root);
+      assert.equal(result.valid, false);
+      assert.equal(result.errors[0].code, fixture.code);
+    });
+  }
+});
