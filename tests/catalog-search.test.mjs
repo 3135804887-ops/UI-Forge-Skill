@@ -146,15 +146,14 @@ test("includes incomplete and invalid records only when explicitly requested", (
 });
 
 test("returns stable summaries without code or source metadata", () => {
-  const [result] = searchCatalog([
-    makeRecord({
-      id: "button/dependency--11111111",
-      title: "Plain",
-      dependencies: ["motion-react"],
-      roles: ["Motion Helper"],
-      diagnostics: [{ code: "FIXTURE" }],
-    }),
-  ], "motion");
+  const source = makeRecord({
+    id: "button/dependency--11111111",
+    title: "Plain",
+    dependencies: ["motion-react"],
+    roles: ["Motion Helper"],
+    diagnostics: [{ code: "FIXTURE" }],
+  });
+  const [result] = searchCatalog([source], "motion");
   assert.deepEqual(result, {
     id: "button/dependency--11111111",
     title: "Plain",
@@ -167,6 +166,8 @@ test("returns stable summaries without code or source metadata", () => {
     diagnostics_count: 1,
   });
   assert.equal(JSON.stringify(result).includes("secret code"), false);
+  result.dependencies.push("summary-only");
+  assert.deepEqual(source.dependencies, ["motion-react"]);
 });
 
 test("suggests deterministic related categories when a category filter has no results", () => {
@@ -178,4 +179,35 @@ test("suggests deterministic related categories when a category filter has no re
   const results = searchCatalog(suggestionRecords, "animated", { category: "button" });
   assert.deepEqual(results, []);
   assert.deepEqual(results.relatedCategories, ["background", "card"]);
+});
+
+test("deduplicates related categories by normalized value and chooses an ordinal display value", () => {
+  const suggestionRecords = [
+    makeRecord({ id: "card/upper--11111111", title: "Animated", category: "Card" }),
+    makeRecord({ id: "card/lower--22222222", title: "Animated", category: "card" }),
+    makeRecord({ id: "card/punctuated--33333333", title: "Animated", category: "Card!!!" }),
+  ];
+  const results = searchCatalog(suggestionRecords, "animated", { category: "button" });
+  assert.deepEqual(results.relatedCategories, ["Card"]);
+});
+
+test("exposes relatedCategories as a deliberate non-enumerable augmented-array contract", () => {
+  const matched = searchCatalog(records, "shimmer button");
+  assert.ok(Array.isArray(matched));
+  assert.deepEqual(matched.relatedCategories, []);
+  assert.equal(Object.getOwnPropertyDescriptor(matched, "relatedCategories").enumerable, false);
+  assert.equal(Object.keys(matched).includes("relatedCategories"), false);
+  assert.deepEqual(JSON.parse(JSON.stringify(matched)), matched.map((result) => ({ ...result })));
+
+  const emptyQuery = searchCatalog(records, "!!!");
+  assert.deepEqual(emptyQuery, []);
+  assert.deepEqual(emptyQuery.relatedCategories, []);
+
+  const noMatch = searchCatalog(records, "does-not-exist");
+  assert.deepEqual(noMatch, []);
+  assert.deepEqual(noMatch.relatedCategories, []);
+
+  const categoryMiss = searchCatalog(records, "shimmer", { category: "card" });
+  assert.deepEqual(categoryMiss.relatedCategories, ["button"]);
+  assert.equal(JSON.stringify(categoryMiss), "[]");
 });
