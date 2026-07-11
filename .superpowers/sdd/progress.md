@@ -12,7 +12,7 @@
 - Task 8: complete (commits 2df82f0..2943f67, review clean after fixes)
 - Task 9: complete (commits 2943f67..fb8c18a, review approved after fixes)
 - Task 10: complete (commits fb8c18a..ba7c6e3, review approved after fixes)
-- Final whole-branch review: in progress; Important 1 resolved after preserving two RED ambiguities and applying minimal frontmatter/static-test fixes. The complete final strict rerun at `1ebffa9` passed 19/19 isolated verdicts and 13/13 baseline labels; all three broad negatives were stable 3/3 `no-trigger`.
+- Final whole-branch review: complete (second review approved; fresh verification 122/122, skill valid, real catalog 3455/0/0).
 - Minor findings: Task 3 unsafe manifest-path errors could include `file: manifest.json` and `path: files[n].path` instead of relying only on the message.
 - Minor findings: Task 6 report's early narrative should mention singleton/merged provenance now lives in `emitted_sources`; its formal contract section is already correct.
 - Minor findings: Task 9 packaging fixture test does not directly compare stored ZIP payload/CRC to source bytes; full-catalog unpack verification has zero hash mismatches.
