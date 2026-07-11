@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
++ Added adversarial non-React category/option trigger cases for Vue, SwiftUI, native HTML, and Chinese framework-specific requests.
+~ Tightened the frontmatter itself so category-option activation requires React/local-catalog context while explicit UI Forge requests still activate.
+~ Corrected the install flow: the current Release archive is legacy input that must be converted by `build-catalog.mjs` before runtime validation; a directly usable cleaned asset is only a future format.
+# Task 9 is the next implementation step; no catalog asset was published during the skill rewrite.
 + Added a concise platform-neutral UI Forge skill entry, progressive configuration/catalog/category/integration references, and Codex/Claude Code thin-adapter documentation.
 + Added Codex `agents/openai.yaml` metadata plus static regressions for the narrow trigger, reference routing, adapter CLI reuse, portable paths, and unsupported quality claims.
 ~ Replaced broad automatic frontend activation with explicit ready-made React component discovery/reuse or explicit UI Forge activation.

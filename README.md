@@ -6,9 +6,9 @@ UI Forge is a platform-neutral skill and zero-dependency Node CLI for finding an
 
 - Node.js 18 or newer
 - This repository installed as a complete skill directory
-- A cleaned UI Forge catalog extracted to a local directory
+- A legacy source archive or a locally generated cleaned UI Forge catalog
 
-The catalog is a separate release asset, not committed to this repository and not a `.skill` installer. Building a catalog from the legacy source is reproducible with the included builder.
+The catalog is not committed to this repository and is not a `.skill` installer. The current GitHub Release asset is the legacy source archive: it cannot be passed directly to `validate`, `search`, or `show`. First extract it, then generate the runtime catalog with the included builder.
 
 ## Install the skill
 
@@ -18,15 +18,24 @@ Clone or copy the complete repository into your assistant's skills location. Do 
 - Claude Code: follow [adapters/claude-code.md](adapters/claude-code.md).
 - Other platforms: implement the narrow contract in [adapters/README.md](adapters/README.md) without forking the core workflow.
 
-## Install and configure the local catalog
+## Build, validate, and configure the local catalog
 
-Extract the cleaned catalog asset to a directory you control, then use one of the discovery mechanisms:
+1. Download the current legacy source archive from the GitHub Release and extract it to a directory you control.
+2. Build a cleaned runtime catalog to a different absolute path:
+
+   ```bash
+   node scripts/build-catalog.mjs --source "/absolute/legacy/source" --output "/absolute/clean/catalog" --json
+   ```
+
+3. Validate the generated output, not the extracted legacy source:
 
 ```bash
-node scripts/ui-forge.mjs validate --catalog "/path/to/catalog" --json
+node scripts/ui-forge.mjs validate --catalog "/absolute/clean/catalog" --json
 ```
 
-Or set `UI_FORGE_CATALOG`, add a project `.ui-forge.json`, add a user config, or use a documented common install directory. See [references/configuration.md](references/configuration.md) for precedence and Windows, macOS, and Linux locations.
+4. Point discovery at that cleaned output with `UI_FORGE_CATALOG`, a project `.ui-forge.json`, a user config, or a documented common install directory. See [references/configuration.md](references/configuration.md) for precedence and Windows, macOS, and Linux locations.
+
+A future release may publish the cleaned catalog directory as a separate asset. If that happens, it can be extracted and validated directly; this README does not claim that asset exists today.
 
 ## CLI
 
@@ -38,13 +47,7 @@ node scripts/ui-forge.mjs show "button/component--digest" [--catalog PATH] [--js
 
 `show` returns every original stored code block. If a record is incomplete, consumers must preserve those blocks and clearly distinguish generated reconstruction.
 
-## Build a cleaned catalog
-
-Use absolute, separate source and output paths:
-
-```bash
-node scripts/build-catalog.mjs --source "/absolute/legacy/source" --output "/absolute/clean/catalog" --json
-```
+## Builder behavior
 
 The builder repairs recoverable data, groups duplicates by source identity, stores code once, removes runtime metadata URLs, emits deterministic reports and manifest bytes, validates temporary output, and promotes it atomically. It never edits the legacy source in place.
 
@@ -58,4 +61,4 @@ The runtime and tests use only Node built-in modules. Format and reconstruction 
 
 ## 中文摘要
 
-UI Forge 是平台中立的 React 现成组件发现与复原技能。技能代码和本地组件数据包相互独立；Codex 与 Claude Code 只提供薄适配层，共享同一套 Node 18+ CLI、数据规范和复原原则。请先安装完整技能目录，再解压本地 catalog，通过 `--catalog`、环境变量或配置文件发现它。`show` 会返回所有原始代码块；任何补全代码都必须明确标记为生成内容。
+UI Forge 是平台中立的 React 现成组件发现与复原技能。技能代码和本地组件数据包相互独立；Codex 与 Claude Code 只提供薄适配层，共享同一套 Node 18+ CLI、数据规范和复原原则。当前 GitHub Release 提供的是 legacy 源归档，不能直接运行 `validate`：先解压，再用 `build-catalog.mjs` 生成独立的 cleaned catalog，最后对生成目录执行 `validate/search/show` 并配置发现路径。未来可能发布可直接解压验证的 cleaned asset，但当前并不存在该发布物。`show` 会返回所有原始代码块；任何补全代码都必须明确标记为生成内容。

@@ -2,19 +2,17 @@
 
 ## Task status
 
-- Completed: rewrote `SKILL.md` as a narrow platform-neutral entry, moved detailed guidance into progressive references, added Codex/Claude Code thin adapters and Codex metadata, reconciled public installation/CLI docs, and added static skill regressions; static, quick validation, and full tests pass, and a fresh-context evaluator matched all 13 frozen trigger labels.
+- Completed: rewrote `SKILL.md` as a narrow platform-neutral entry, moved detailed guidance into progressive references, added Codex/Claude Code thin adapters and Codex metadata, reconciled public installation/CLI docs, and added static skill regressions; static, quick validation, and full tests pass, and a fresh-context evaluator matched all 18 original-plus-adversarial trigger labels.
 - Completed: implemented and review-hardened zero-dependency legacy-record loading, malformed JSON/code-block recovery, normalized-URL deduplication, complete source-to-emitted report mappings, deterministic merge-base selection, project-alias-aware static analysis, URL-free asset identities, and all four reconstruction statuses; focused and full tests pass.
 - Completed: added and review-hardened deterministic catalog filesystem output, shared-rule manifest generation, auditable reports, realpath-aware source/output containment, validation-gated atomic promotion, non-fatal post-promotion cleanup warnings, and an absolute-path build CLI; focused and full tests pass.
-- In progress (next): rewrite the skill with progressive disclosure and add portable assistant adapters.
 - Completed: added and review-hardened the zero-dependency `validate`, `search`, and `show` CLI with strict nonblank arguments, stable JSON/human output (including structured JSON usage errors), explicit related-category envelopes, shared exact-ID validation, and exit codes `0`/`1`/`2`; focused and full tests pass.
 - Completed: implemented deterministic catalog search with Unicode-aware normalization, documented integer scoring, status/category filters, stable code-free summaries, and no-result related-category suggestions; focused and full tests pass.
 - Completed: hardened catalog integrity after review with the Task 7 manifest-digest contract, normalized safe component paths, explicit containment checks, and complete discovery diagnostics.
 - Completed: implemented deterministic catalog loading with manifest/component digest checks, schema and record validation, duplicate-ID rejection, and structured validation results.
 - Completed: implemented cross-platform catalog discovery precedence for CLI, environment, nearest project config, user config, and common install paths, including rejected-candidate diagnostics.
-- In progress (next): build deterministic search and reconstruction behavior on top of the loaded catalog records.
 - Completed: added the zero-dependency Node 18+ test harness, deterministic catalog fixture helpers, and runtime validators for schema version 1 records/manifests; review regressions now cover the full implemented validation surface and exact code URL exemption.
 - Completed: established the pre-rewrite trigger baseline with 13 bilingual cases and 19 fresh-context classifications; all 7 negative cases currently over-trigger, including stable 3/3 failures for generic English/Chinese page creation and English debugging.
-- In progress (next): rewrite the skill trigger description against the immutable baseline, then rerun the same prompt matrix as forward tests.
+- Next: execute Task 9 against the full legacy archive, generate the cleaned catalog outside Git, validate record accounting and known repairs, repeat the build for determinism, and package local evidence without publishing a release.
 - Completed: cloned `3135804887-ops/UI-Forge-Skill` into the workspace and reviewed the repository, release metadata, and component archive structure.
 - Completed: confirmed the first-round architecture, data flow, reconstruction policy, error handling, and testing strategy with the user.
 - Completed: wrote `docs/superpowers/specs/2026-07-11-ui-forge-first-round-design.md`.
@@ -25,6 +23,7 @@
 ## Recent decisions
 
 - Keep `SKILL.md` below 650 words with only the trigger boundary, validate/search/show integration workflow, reconstruction preservation rule, direct reference routing, and common failure handling.
+- Require frontmatter—not only body instructions—to exclude Vue, SwiftUI, native HTML, and other non-React category-option requests; explicit UI Forge requests remain an unconditional activation path.
 - Make `references/categories.md` the only hand-maintained category table; `CATEGORIES.md` is a compatibility pointer rather than a duplicate count source.
 - Limit adapters to install location, invocation syntax, and assistant metadata while requiring both Codex and Claude Code to invoke `node scripts/ui-forge.mjs` and use the same discovery configuration.
 - Preserve official assistant documentation links only in adapter documentation; keep runtime catalog metadata URL-free and retain functional URLs only inside component code.
